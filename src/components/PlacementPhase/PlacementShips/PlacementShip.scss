@@ -1,0 +1,11 @@
+.ship-container {
+  border: 2px solid black;
+  border-radius: 5px;
+  background-color: lightgray;
+  position: absolute;
+  top: calc(0.75vh - 1px);
+  left: calc(0.75vh - 1px);
+  z-index: 2;
+  cursor: pointer;
+  transition: background-color 250ms, opacity 250ms;
+}
