@@ -1,12 +1,11 @@
 import PlacementBoard from "./PlacementBoard/PlacementBoard";
 import PlacementSidebar from "./PlacementSidebar/PlacementSidebar";
 
-export default function Placement({ gameBoardState, shipState, changeShipRotation, canMoveShip, moveShip }) {
+export default function Placement({ state, changeShipRotation, canMoveShip, moveShip }) {
   return (
     <>
       <PlacementBoard
-        gameBoardState={gameBoardState}
-        shipState={shipState}
+        state={state}
         changeShipRotation={changeShipRotation}
         canMoveShip={canMoveShip}
         moveShip={moveShip}

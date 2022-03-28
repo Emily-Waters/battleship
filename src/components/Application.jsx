@@ -6,12 +6,12 @@ import Placement from "./PlacementPhase";
 
 export default function App() {
   const { state, changeShipRotation, canMoveShip, moveShip } = useApplicationData();
+  console.log(state);
   return (
     <div className="App">
       <DndProvider backend={HTML5Backend}>
         <Placement
-          gameBoardState={state.placementBoard}
-          shipState={state.ships}
+          state={state}
           changeShipRotation={changeShipRotation}
           canMoveShip={canMoveShip}
           moveShip={moveShip}

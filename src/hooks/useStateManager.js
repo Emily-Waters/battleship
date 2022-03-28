@@ -1,44 +1,49 @@
 import { useReducer } from "react";
 
 export default function useStateManager() {
+  //---------------------------------------------REDUCER VARIABLES------------------------------------------------------
   const reducerVariables = {
-    SET_PLACEMENT_BOARD: "SET_PLACEMENT_BOARD",
-    UPDATE_SHIPS: "UPDATE_SHIPS",
-    UPDATE_GAME_BOARD: "UPDATE_GAME_BOARD",
+    UPDATE_BOARD: "UPDATE_BOARD",
   };
-
   const r = reducerVariables;
+  //---------------------------------------------------SHIPS------------------------------------------------------------
+  const ships = [
+    { name: "BATTLESHIP", XY: [7, 2], isVertical: true, size: 5, sections: [] },
+    { name: "CRUISER", XY: [1, 2], isVertical: true, size: 4, sections: [] },
+    { name: "FRIGATE", XY: [2, 2], isVertical: true, size: 4, sections: [] },
+    { name: "DESTROYER", XY: [3, 2], isVertical: true, size: 3, sections: [] },
+    { name: "SCOUT", XY: [4, 2], isVertical: true, size: 2, sections: [] },
+  ];
+  //---------------------------------------------------BOARD------------------------------------------------------------
+  const boardSize = 10;
+  const rowTemplate = Array.from(Array(boardSize));
 
+  const board = rowTemplate.map((_, y) => {
+    return rowTemplate.map((_, x) => {
+      return { id: y * 10 + x, XY: [x, y], isOccupied: false, occupiedBy: null };
+    });
+  });
+
+  //---------------------------------------------------INIT-------------------------------------------------------------
   const initialState = {
-    ships: [],
-    placementBoard: [],
+    ships: ships,
+    board: board,
   };
-
+  //--------------------------------------------------REDUCER-----------------------------------------------------------
   const [state, dispatch] = useReducer(reducer, initialState);
 
   function reducer(state, action) {
     switch (action.type) {
-      case r.SET_PLACEMENT_BOARD:
+      case r.UPDATE_BOARD:
         return {
           ...state,
           ships: action.value.ships,
-          placementBoard: action.value.placementBoard,
+          board: action.value.board,
         };
-      case r.UPDATE_SHIPS:
-        return {
-          ...state,
-          ships: action.value,
-        };
-      case r.UPDATE_GAME_BOARD:
-        return {
-          ...state,
-          placementBoard: action.value,
-        };
-
       default:
         return { ...state };
     }
   }
-
+  //--------------------------------------------------RETURN------------------------------------------------------------
   return { state, dispatch, r };
 }

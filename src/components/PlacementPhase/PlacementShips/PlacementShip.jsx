@@ -2,24 +2,24 @@ import React from "react";
 import { useDrag } from "react-dnd";
 import "./PlacementShip.scss";
 
-function PlacementShip({ shipItem, changeShipRotation, shipState, gameBoardState }) {
-  const shipStyle = shipItem.isVertical
-    ? { height: `calc(7.5vh*${shipItem.size} - 1.5vh)`, width: "6vh" }
-    : { width: `calc(7.5vh * ${shipItem.size} - 1.5vh)`, height: "6vh" };
+function PlacementShip({ currentShip, changeShipRotation, state }) {
+  const shipStyle = currentShip.isVertical
+    ? { height: `calc(7.5vh*${currentShip.size} - 1.5vh)`, width: "6vh" }
+    : { width: `calc(7.5vh * ${currentShip.size} - 1.5vh)`, height: "6vh" };
 
   function handleClick() {
-    changeShipRotation(shipItem, shipState, gameBoardState);
+    changeShipRotation(currentShip, state);
   }
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
-      type: shipItem.name,
-      item: shipItem,
+      type: currentShip.name,
+      item: currentShip,
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [shipState]
+    [state.ships]
   );
 
   return (
