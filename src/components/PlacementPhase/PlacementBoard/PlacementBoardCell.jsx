@@ -5,13 +5,13 @@ import Overlay from "./Overlay";
 
 const shipTypes = ["BATTLESHIP", "CRUISER", "FRIGATE", "DESTROYER", "SCOUT"];
 
-function PlacementBoardCell({ cellXY, currentShip, changeShipRotation, canMoveShip, moveShip, state }) {
-  const isHead = currentShip && currentShip.XY[0] === cellXY[0] && currentShip.XY[1] === cellXY[1];
+function PlacementBoardCell({ cellXY, ship, canRotateShip, rotateShip, canMoveShip, moveShip, state }) {
+  const isHead = ship && ship.XY[0] === cellXY[0] && ship.XY[1] === cellXY[1];
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: shipTypes,
-      canDrop: (item) => canMoveShip(cellXY, item, state),
-      drop: (item) => moveShip(cellXY, item, state),
+      canDrop: ({ ship }) => canMoveShip(cellXY, ship, state),
+      drop: ({ ship }) => moveShip(cellXY, ship, state),
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
         canDrop: !!monitor.canDrop(),
@@ -22,9 +22,9 @@ function PlacementBoardCell({ cellXY, currentShip, changeShipRotation, canMoveSh
 
   return (
     <div className={"board-cell"} ref={drop}>
-      {isHead && <PlacementShip currentShip={currentShip} changeShipRotation={changeShipRotation} state={state} />}
+      {isHead && <PlacementShip ship={ship} canRotateShip={canRotateShip} rotateShip={rotateShip} state={state} />}
       {isOver && <Overlay canDrop={canDrop} />}
-      {currentShip && <div className="board-cell-hitmarker"></div>}
+      {ship && <div className="board-cell-hitmarker"></div>}
     </div>
   );
 }

@@ -1,15 +1,18 @@
+@import "../../../styles/variables.scss";
+
 .ship-container {
   border: 2px solid black;
   border-radius: 5px;
   background-color: lightgray;
   position: absolute;
-  top: calc(0.75vh - 1px);
-  left: calc(0.75vh - 1px);
+  top: calc(0.25vw - 1px);
+  left: calc(0.25vw - 1px);
   z-index: 2;
   cursor: pointer;
   transition: background-color 250ms, opacity 250ms;
 
   &:hover {
     z-index: 4;
+    box-shadow: 0px 0px 10px black;
   }
 }

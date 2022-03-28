@@ -3,120 +3,108 @@ import useStateManager from "./useStateManager";
 export default function useApplicationData() {
   const { state, dispatch, r } = useStateManager();
 
-  function updateBoard({ ships, board }) {
-    console.log("UPDATE BOARD");
-    const updatedShips = ships.map((ship) => {
-      return {
-        ...ship,
-        sections: Array.from(Array(ship.size)).map((_, i) => {
-          return ship.isVertical
-            ? { id: i, XY: [ship.XY[0], ship.XY[1] + i] }
-            : { id: i, XY: [ship.XY[0] + i, ship.XY[1]] };
-        }),
-      };
+  function generateBoard() {
+    const boardSize = 10;
+    const rowTemplate = Array.from(Array(boardSize));
+
+    return rowTemplate.map((_, y) => {
+      return rowTemplate.map((_, x) => {
+        return { id: y * 10 + x, XY: [x, y], isOccupied: false, occupiedBy: null };
+      });
     });
-    const updatedBoard = setCellStatus({ ships: updatedShips, board });
-    console.log(updatedShips);
-    dispatch({ type: r.UPDATE_BOARD, value: { ships: updatedShips, board: updatedBoard } });
+  }
+
+  function updateBoard({ ships }) {
+    const updatedShips = ships.map((ship) => {
+      return mapShipSections(ship);
+    });
+    const board = setCellStatus({ ships: updatedShips });
+    dispatch({ type: r.UPDATE_BOARD, value: { ships: updatedShips, board } });
   }
 
   useEffect(() => {
     updateBoard(state);
   }, []);
 
-  function setCellStatus({ ships, board }) {
-    const [...boardCopy] = board;
-    boardCopy.forEach((row) => {
-      row.forEach((cell) => {
-        cell.isOccupied = false;
-        cell.occupiedBy = null;
-      });
-    });
+  function setCellStatus({ ships }) {
+    const board = generateBoard();
+
     ships.forEach((ship) => {
       ship.sections.forEach((section) => {
-        boardCopy[section.XY[1]][section.XY[0]].isOccupied = true;
-        boardCopy[section.XY[1]][section.XY[0]].occupiedBy = ship.name;
+        board[section.XY[1]][section.XY[0]].isOccupied = true;
+        board[section.XY[1]][section.XY[0]].occupiedBy = ship.name;
       });
     });
 
-    return boardCopy;
+    return board;
   }
 
-  function canRotateShip(currentShip, { board }) {
-    const isInBounds = currentShip.isVertical
-      ? currentShip.XY[0] + currentShip.size <= 10
-      : currentShip.XY[1] + currentShip.size <= 10;
+  function mapShipSections(currentShip) {
+    return {
+      ...currentShip,
+      sections: Array.from(Array(currentShip.size)).map((_, i) => {
+        return currentShip.isVertical
+          ? { id: i, XY: [currentShip.XY[0], currentShip.XY[1] + i] }
+          : { id: i, XY: [currentShip.XY[0] + i, currentShip.XY[1]] };
+      }),
+    };
+  }
+
+  function checkInBounds({ XY, isVertical, size }) {
+    return isVertical ? XY[1] + size <= 10 : XY[0] + size <= 10;
+  }
+
+  function checkCollision(currentShip, board) {
     let isCollision = false;
 
     currentShip.sections.forEach((section, index) => {
-      if (currentShip.isVertical) {
-        if (board[currentShip.XY[1]][currentShip.XY[0] + index].isOccupied) {
-          if (board[currentShip.XY[1]][currentShip.XY[0] + index].occupiedBy !== currentShip.name) {
-            isCollision = true;
-          }
-        }
-      }
-      if (!currentShip.isVertical) {
-        if (board[currentShip.XY[1] + index][currentShip.XY[0]].isOccupied) {
-          if (board[currentShip.XY[1] + index][currentShip.XY[0]].occupiedBy !== currentShip.name) {
-            isCollision = true;
-          }
-        }
+      if (board[section.XY[1]][section.XY[0]].isOccupied) {
+        isCollision = board[section.XY[1]][section.XY[0]].occupiedBy !== currentShip.name;
       }
     });
+
+    return isCollision;
+  }
+
+  function canRotateShip(ship, { board }) {
+    const { ...shipCopy } = ship;
+
+    shipCopy.isVertical = !ship.isVertical;
+
+    const updatedShip = mapShipSections(shipCopy);
+    const isInBounds = checkInBounds(updatedShip);
+    const isCollision = isInBounds && checkCollision(updatedShip, board);
+
     return isInBounds && !isCollision;
   }
 
-  function changeShipRotation(currentShip, { ships, board }) {
-    if (canRotateShip(currentShip, board)) {
-      const [...shipCopy] = ships;
-      shipCopy.find((ship) => ship.name === currentShip.name).isVertical = !currentShip.isVertical;
-      updateBoard({ ships: shipCopy, board });
-    }
+  function rotateShip(ship, { ships, board }) {
+    const [...updatedShips] = ships;
+
+    updatedShips.find(({ name }) => name === ship.name).isVertical = !ship.isVertical;
+
+    updateBoard({ ships: updatedShips });
   }
 
-  function canMoveShip(XY, currentShip, { board }) {
-    const isInBounds = currentShip.isVertical ? XY[1] + currentShip.size <= 10 : XY[0] + currentShip.size <= 10;
-    let isCollision = false;
-    if (isInBounds) {
-      const updatedShipItem = {
-        ...currentShip,
-        XY: XY,
-        isVertical: currentShip.isVertical,
-        sections: Array.from(Array(currentShip.size)).map((_, index) => {
-          return currentShip.isVertical
-            ? { id: index, XY: [XY[0], XY[1] + index] }
-            : { id: index, XY: [XY[0] + index, XY[1]] };
-        }),
-      };
-      updatedShipItem.sections.forEach((section, index) => {
-        if (board[section.XY[1]][section.XY[0]].isOccupied) {
-          isCollision = board[section.XY[1]][section.XY[0]].occupiedBy !== currentShip.name;
-        }
-      });
-    }
+  function canMoveShip(cellXY, ship, { board }) {
+    const { ...shipCopy } = ship;
+
+    shipCopy.XY = cellXY;
+
+    const updatedShip = mapShipSections(shipCopy);
+    const isInBounds = checkInBounds(updatedShip);
+    const isCollision = isInBounds && checkCollision(updatedShip, board);
+
     return isInBounds && !isCollision;
   }
 
-  function moveShip(XY, currentShip, { ships, board }) {
-    const [...shipsCopy] = ships;
-    const updatedShips = shipsCopy.map((ship) => {
-      return ship.name === currentShip.name
-        ? {
-            ...ship,
-            isVertical: currentShip.isVertical,
-            XY: XY,
-            sections: Array.from(Array(ship.size)).map((_, index) => {
-              return currentShip.isVertical
-                ? { id: index, XY: [XY[0], XY[1] + index] }
-                : { id: index, XY: [XY[0] + index, XY[1]] };
-            }),
-          }
-        : { ...ship };
-    });
+  function moveShip(cellXY, ship, { ships, board }) {
+    const [...updatedShips] = ships;
 
-    updateBoard({ ships: updatedShips, board });
+    updatedShips.find(({ name }) => name === ship.name).XY = cellXY;
+
+    updateBoard({ ships: updatedShips });
   }
 
-  return { state, changeShipRotation, canMoveShip, moveShip };
+  return { state, canRotateShip, rotateShip, canMoveShip, moveShip };
 }

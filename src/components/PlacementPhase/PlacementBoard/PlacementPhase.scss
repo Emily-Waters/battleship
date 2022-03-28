@@ -1,6 +1,8 @@
+@import "../../../styles/variables.scss";
+
 .placement-board {
-  height: calc(75vh + 20px);
-  width: calc(75vh + 20px);
+  height: calc($cell-size * 11);
+  width: calc($cell-size * 11);
   background-color: darkgray;
   border: 2px solid black;
   border-radius: 5px;
@@ -13,8 +15,8 @@
     align-items: center;
 
     .board-cell {
-      height: 7.5vh;
-      width: 7.5vh;
+      height: $cell-size;
+      width: $cell-size;
       background-color: grey;
       border: 1px solid darkgray;
       position: relative;

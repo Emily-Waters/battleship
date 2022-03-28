@@ -2,19 +2,21 @@ import React from "react";
 import { useDrag } from "react-dnd";
 import "./PlacementShip.scss";
 
-function PlacementShip({ currentShip, changeShipRotation, state }) {
-  const shipStyle = currentShip.isVertical
-    ? { height: `calc(7.5vh*${currentShip.size} - 1.5vh)`, width: "6vh" }
-    : { width: `calc(7.5vh * ${currentShip.size} - 1.5vh)`, height: "6vh" };
+function PlacementShip({ ship, canRotateShip, rotateShip, state }) {
+  const shipStyle = ship.isVertical
+    ? { height: `calc(4vw * ${ship.size} - 0.5vw)`, width: "3.5vw" }
+    : { width: `calc(4vw * ${ship.size} - 0.5vw)`, height: "3.5vw" };
 
   function handleClick() {
-    changeShipRotation(currentShip, state);
+    if (canRotateShip(ship, state)) {
+      rotateShip(ship, state);
+    }
   }
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
-      type: currentShip.name,
-      item: currentShip,
+      type: ship.name,
+      item: { ship },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),

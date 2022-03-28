@@ -5,14 +5,14 @@ import "./Application.scss";
 import Placement from "./PlacementPhase";
 
 export default function App() {
-  const { state, changeShipRotation, canMoveShip, moveShip } = useApplicationData();
-  console.log(state);
+  const { state, canRotateShip, rotateShip, canMoveShip, moveShip } = useApplicationData();
   return (
     <div className="App">
       <DndProvider backend={HTML5Backend}>
         <Placement
           state={state}
-          changeShipRotation={changeShipRotation}
+          canRotateShip={canRotateShip}
+          rotateShip={rotateShip}
           canMoveShip={canMoveShip}
           moveShip={moveShip}
         />
