@@ -3,10 +3,13 @@
 .placement-board {
   height: calc($cell-size * 11);
   width: calc($cell-size * 11);
-  background-color: darkgray;
-  border: 2px solid black;
-  border-radius: 5px;
+  // background-color: darkgray;
+
+  border: 10px solid black;
+  border-radius: 20px;
   padding: 10px;
+  background-image: url("https://www.stockvault.net/data/2020/06/30/277255/preview16.jpg");
+  // background-size: contain;
 
   .board-row {
     display: flex;
@@ -17,16 +20,16 @@
     .board-cell {
       height: $cell-size;
       width: $cell-size;
-      background-color: grey;
-      border: 1px solid darkgray;
+      box-shadow: 0px 0px 10px black inset;
+      // background-color: grey;
+      border: 1px solid rgba(169, 169, 169, 0.1);
       position: relative;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       overflow: visible;
 
       .board-cell-hitmarker {
-        // position: absolute;
         height: 2vh;
         width: 2vh;
         border: 2px solid black;

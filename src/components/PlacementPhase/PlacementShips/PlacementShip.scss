@@ -9,10 +9,19 @@
   left: calc(0.25vw - 1px);
   z-index: 2;
   cursor: pointer;
-  transition: background-color 250ms, opacity 250ms;
+  transition: all 250ms, z-index 0s;
+  transform-origin: 1.75vw 1.75vw;
+  transform: rotate(-90deg);
+  width: $cell-size - 0.5vw;
 
-  &:hover {
-    z-index: 4;
-    box-shadow: 0px 0px 10px black;
+  // &:hover {
+  //   z-index: 4;
+  //   box-shadow: 0px 0px 10px black;
+  //   transform: scale(1.02);
+  // }
+
+  &--rotated {
+    @extend.ship-container;
+    transform: rotate(0deg);
   }
 }

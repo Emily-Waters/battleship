@@ -8,11 +8,11 @@ export default function useStateManager() {
   const r = reducerVariables;
   //---------------------------------------------------SHIPS------------------------------------------------------------
   const ships = [
-    { name: "BATTLESHIP", XY: [7, 2], isVertical: true, size: 5, sections: [] },
-    { name: "CRUISER", XY: [1, 2], isVertical: true, size: 4, sections: [] },
-    { name: "FRIGATE", XY: [2, 2], isVertical: true, size: 4, sections: [] },
-    { name: "DESTROYER", XY: [3, 2], isVertical: true, size: 3, sections: [] },
-    { name: "SCOUT", XY: [4, 2], isVertical: true, size: 2, sections: [] },
+    { name: "BATTLESHIP", XY: [0, 0], isVertical: true, size: 5, sections: [] },
+    { name: "CRUISER", XY: [1, 0], isVertical: true, size: 4, sections: [] },
+    { name: "FRIGATE", XY: [2, 0], isVertical: true, size: 4, sections: [] },
+    { name: "DESTROYER", XY: [3, 0], isVertical: true, size: 3, sections: [] },
+    { name: "SCOUT", XY: [4, 0], isVertical: true, size: 2, sections: [] },
   ];
   //---------------------------------------------------INIT-------------------------------------------------------------
   const initialState = {
