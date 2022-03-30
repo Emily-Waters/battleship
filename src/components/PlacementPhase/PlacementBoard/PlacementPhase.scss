@@ -9,7 +9,7 @@
   border-radius: 20px;
   padding: 10px;
   background-image: url("https://www.stockvault.net/data/2020/06/30/277255/preview16.jpg");
-  // background-size: contain;
+  background-size: contain;
 
   .board-row {
     display: flex;
@@ -21,7 +21,6 @@
       height: $cell-size;
       width: $cell-size;
       box-shadow: 0px 0px 10px black inset;
-      // background-color: grey;
       border: 1px solid rgba(169, 169, 169, 0.1);
       position: relative;
       display: flex;
@@ -30,11 +29,11 @@
       overflow: visible;
 
       .board-cell-hitmarker {
-        height: 2vh;
-        width: 2vh;
+        height: $cell-size / 3;
+        width: $cell-size / 3;
         border: 2px solid black;
         background-color: grey;
-        border-radius: 1vh;
+        border-radius: $cell-size / 6;
         z-index: 3;
       }
     }
