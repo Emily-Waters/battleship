@@ -1,7 +1,7 @@
 import PlacementBoardCell from "./PlacementBoardCell";
 import "./PlacementPhase.scss";
 
-export default function PlacementBoard({ state, canRotateShip, rotateShip, canMoveShip, moveShip }) {
+export default function PlacementBoard({ state, shipFunctions }) {
   function renderBoard({ ships, board }) {
     return board.map((row, index) => {
       return (
@@ -16,10 +16,7 @@ export default function PlacementBoard({ state, canRotateShip, rotateShip, canMo
                 cellXY={cell.XY}
                 state={state}
                 ship={ship}
-                canRotateShip={canRotateShip}
-                rotateShip={rotateShip}
-                canMoveShip={canMoveShip}
-                moveShip={moveShip}
+                shipFunctions={shipFunctions}
               />
             );
           })}

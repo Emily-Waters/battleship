@@ -3,6 +3,7 @@ import { useReducer } from "react";
 export default function useStateManager() {
   //---------------------------------------------REDUCER VARIABLES------------------------------------------------------
   const reducerVariables = {
+    UPDATE_USER: "UPDATE_USER",
     UPDATE_BOARD: "UPDATE_BOARD",
     SET_SOCKET: "SET_SOCKET",
   };
@@ -15,8 +16,15 @@ export default function useStateManager() {
     { name: "DESTROYER", XY: [3, 0], isVertical: true, size: 3, sections: [] },
     { name: "SCOUT", XY: [4, 0], isVertical: true, size: 2, sections: [] },
   ];
+
+  ships.forEach((ship) => {
+    ship.sections = Array.from(Array(ship.size)).map((_, i) => {
+      return { id: i, isHit: false, XY: ship.isVertical ? [ship.XY[0], ship.XY[1] + i] : [ship.XY[0] + i, ship.XY[1]] };
+    });
+  });
   //---------------------------------------------------INIT-------------------------------------------------------------
   const initialState = {
+    user: null,
     ships: ships,
     board: [],
     socket: null,
@@ -26,6 +34,11 @@ export default function useStateManager() {
 
   function reducer(state, action) {
     switch (action.type) {
+      case r.UPDATE_USER:
+        return {
+          ...state,
+          user: action.value,
+        };
       case r.UPDATE_BOARD:
         return {
           ...state,

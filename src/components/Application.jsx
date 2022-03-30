@@ -3,22 +3,23 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import useApplicationData from "../hooks/useApplicationData";
 import useSocketMan from "../hooks/useBackend";
 import "./Application.scss";
-import Placement from "./PlacementPhase";
+import Login from "./Login/Login";
+import Placement from "./Placement";
+
 export default function App() {
-  const { state, canRotateShip, rotateShip, canMoveShip, moveShip } = useApplicationData();
+  const { state, shipFunctions, loginFunctions } = useApplicationData();
+
   useSocketMan();
 
   return (
     <div className="App">
-      <DndProvider backend={HTML5Backend}>
-        <Placement
-          state={state}
-          canRotateShip={canRotateShip}
-          rotateShip={rotateShip}
-          canMoveShip={canMoveShip}
-          moveShip={moveShip}
-        />
-      </DndProvider>
+      {!state.user ? (
+        <Login loginFunctions={loginFunctions} />
+      ) : (
+        <DndProvider backend={HTML5Backend}>
+          <Placement state={state} shipFunctions={shipFunctions} />
+        </DndProvider>
+      )}
     </div>
   );
 }

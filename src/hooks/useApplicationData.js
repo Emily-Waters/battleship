@@ -2,18 +2,7 @@ import { useEffect } from "react";
 import useStateManager from "./useStateManager";
 export default function useApplicationData() {
   const { state, dispatch, r } = useStateManager();
-
-  function generateBoard() {
-    const boardSize = 10;
-    const rowTemplate = Array.from(Array(boardSize));
-
-    return rowTemplate.map((_, y) => {
-      return rowTemplate.map((_, x) => {
-        return { id: y * 10 + x, XY: [x, y], isOccupied: false, occupiedBy: null };
-      });
-    });
-  }
-
+  //---------------------------------------------INITIALIZE GAMEBOARD---------------------------------------------------
   function updateBoard({ ships }) {
     const updatedShips = ships.map((ship) => {
       return mapShipSections(ship);
@@ -25,6 +14,17 @@ export default function useApplicationData() {
   useEffect(() => {
     updateBoard(state);
   }, []);
+  //-----------------------------------------------MANAGE GAMEBOARD-----------------------------------------------------
+  function generateBoard() {
+    const boardSize = 10;
+    const rowTemplate = Array.from(Array(boardSize));
+
+    return rowTemplate.map((_, y) => {
+      return rowTemplate.map((_, x) => {
+        return { id: y * 10 + x, XY: [x, y], isOccupied: false, occupiedBy: null };
+      });
+    });
+  }
 
   function setCellStatus({ ships }) {
     const board = generateBoard();
@@ -38,14 +38,12 @@ export default function useApplicationData() {
 
     return board;
   }
-
-  function mapShipSections(currentShip) {
+  //-------------------------------------------------MANAGE SHIPS-------------------------------------------------------
+  function mapShipSections(ship) {
     return {
-      ...currentShip,
-      sections: Array.from(Array(currentShip.size)).map((_, i) => {
-        return currentShip.isVertical
-          ? { id: i, XY: [currentShip.XY[0], currentShip.XY[1] + i] }
-          : { id: i, XY: [currentShip.XY[0] + i, currentShip.XY[1]] };
+      ...ship,
+      sections: ship.sections.map((section, i) => {
+        return { ...section, XY: ship.isVertical ? [ship.XY[0], ship.XY[1] + i] : [ship.XY[0] + i, ship.XY[1]] };
       }),
     };
   }
@@ -105,6 +103,16 @@ export default function useApplicationData() {
 
     updateBoard({ ships: updatedShips });
   }
-
-  return { state, canRotateShip, rotateShip, canMoveShip, moveShip };
+  //-----------------------------------------------------LOGIN----------------------------------------------------------
+  function validateUser(name, password) {
+    // axios.post("api/users/login", { name, password });
+    console.log(name);
+    dispatch({ type: r.UPDATE_USER, value: name });
+  }
+  //-----------------------------------------------------RETURN---------------------------------------------------------
+  return {
+    state,
+    shipFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
+    loginFunctions: { validateUser },
+  };
 }
