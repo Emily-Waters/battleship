@@ -24,7 +24,6 @@ function PlacementBoardCell({ cellXY, ship, canRotateShip, rotateShip, canMoveSh
     <div className={"board-cell"} ref={drop}>
       {isHead && <PlacementShip ship={ship} canRotateShip={canRotateShip} rotateShip={rotateShip} state={state} />}
       {isOver && <Overlay canDrop={canDrop} />}
-      {ship && <div className="board-cell-hitmarker"></div>}
     </div>
   );
 }
