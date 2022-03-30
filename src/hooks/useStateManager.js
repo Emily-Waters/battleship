@@ -4,6 +4,7 @@ export default function useStateManager() {
   //---------------------------------------------REDUCER VARIABLES------------------------------------------------------
   const reducerVariables = {
     UPDATE_BOARD: "UPDATE_BOARD",
+    SET_SOCKET: "SET_SOCKET",
   };
   const r = reducerVariables;
   //---------------------------------------------------SHIPS------------------------------------------------------------
@@ -18,6 +19,7 @@ export default function useStateManager() {
   const initialState = {
     ships: ships,
     board: [],
+    socket: null,
   };
   //--------------------------------------------------REDUCER-----------------------------------------------------------
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -29,6 +31,11 @@ export default function useStateManager() {
           ...state,
           ships: action.value.ships,
           board: action.value.board,
+        };
+      case r.SET_SOCKET:
+        return {
+          ...state,
+          socket: action.value,
         };
       default:
         return { ...state };

@@ -1,12 +1,9 @@
 import { useEffect } from "react";
-import useBackend from "./useBackend";
 import useStateManager from "./useStateManager";
 export default function useApplicationData() {
   const { state, dispatch, r } = useStateManager();
-  const { apiCall } = useBackend();
 
   function generateBoard() {
-    apiCall();
     const boardSize = 10;
     const rowTemplate = Array.from(Array(boardSize));
 
