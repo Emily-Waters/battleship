@@ -1,12 +1,13 @@
 require("dotenv").config();
-const db = require("./db/index");
 const bcrypt = require("bcryptjs");
+const db = require("./db/index");
 const express = require("express");
 const socketIo = require("socket.io");
 const http = require("http");
+const usersRoutes = require("./routes/users");
 const bodyParser = require("body-parser");
-const PORT = process.env.PORT || 5000;
-
+const PORT = process.env.SERVER_PORT || 5000;
+const chalk = require("chalk");
 const app = express();
 app.use(bodyParser.json());
 app.use(
@@ -14,11 +15,9 @@ app.use(
     extended: true,
   })
 );
+app.use("/api/users", usersRoutes);
 
 const server = http.createServer(app);
-
-const usersRoutes = require("./routes/users");
-// app.use("/api/users", usersRoutes);
 
 const io = socketIo(server, {
   cors: {
@@ -26,15 +25,25 @@ const io = socketIo(server, {
   },
 });
 
+const userPool = {};
+
 io.on("connection", (socket) => {
-  console.log("client connected: ", socket.id);
+  console.log(chalk.magenta("client connected"), chalk.yellowBright(socket.id));
+
+  userPool[socket.id] = socket.handshake.query.name;
+  io.emit("user", userPool);
+  console.log(`${userPool[socket.id]} - connected`);
+  console.log("User Pool : ", userPool);
 
   socket.on("disconnect", (reason) => {
-    console.log(reason);
+    console.log(`${userPool[socket.id]} - disconnected - ${reason}`);
+    delete userPool[socket.id];
+    console.log("User Pool : ", userPool);
+    io.emit("user", userPool);
   });
 });
 
 server.listen(PORT, (err) => {
   if (err) console.log(err);
-  console.log("Server running on Port: ", PORT);
+  console.log(chalk.green(`\nServer running on port : ${chalk.yellow(PORT)}`));
 });
