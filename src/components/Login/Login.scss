@@ -45,13 +45,26 @@
       justify-content: space-evenly;
       width: 100%;
       .login-form-btn {
-        transform: scale(3);
+        font-size: 2vw;
+        font-weight: bold;
+        height: 4vw;
+        width: 12vw;
         background-color: unset;
-        backdrop-filter: blur(1px);
+        backdrop-filter: blur(10px);
         color: aliceblue;
         outline: none;
-        border: 2px solid white;
-        border-radius: 5px;
+        border: 5px solid white;
+        border-radius: 1vw;
+
+        transition-duration: 125ms;
+
+        cursor: pointer;
+
+        &:hover {
+          box-shadow: 0px 0px 10px rgb(255, 255, 255) inset;
+          text-shadow: 0px 0px 10px white;
+          transform: scale(1.1);
+        }
       }
     }
   }

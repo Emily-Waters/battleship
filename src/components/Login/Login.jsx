@@ -7,7 +7,7 @@ export default function Login({ loginFunctions, error }) {
 
   return (
     <div className="login-container">
-      <h2 className="login-title">BATTLESHIP</h2>
+      <h2 className="login-title">SHATTLEBIP</h2>
       <span className="login-error" style={{ opacity: error ? 1 : 0 }}>
         {error}
       </span>
@@ -43,8 +43,12 @@ export default function Login({ loginFunctions, error }) {
           />
         </label>
         <span className="login-btn-container">
-          <button className="login-form-btn">Register</button>
-          <button className="login-form-btn">Login</button>
+          <button type="button" className="login-form-btn">
+            Register
+          </button>
+          <button type="submit" className="login-form-btn">
+            Login
+          </button>
         </span>
       </form>
     </div>
