@@ -19,6 +19,16 @@
     text-decoration: underline;
   }
 
+  .login-error {
+    height: 3vw;
+    width: 100%;
+    font-size: 2vw;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    transition-duration: 250ms;
+  }
+
   .login-form {
     display: flex;
     flex-direction: column;
@@ -29,15 +39,20 @@
     .login-form-label {
       transform: scale(2);
     }
-
-    .login-form-btn {
-      transform: scale(3);
-      background-color: unset;
-      backdrop-filter: blur(1px);
-      color: aliceblue;
-      outline: none;
-      border: 2px solid white;
-      border-radius: 5px;
+    .login-btn-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      width: 100%;
+      .login-form-btn {
+        transform: scale(3);
+        background-color: unset;
+        backdrop-filter: blur(1px);
+        color: aliceblue;
+        outline: none;
+        border: 2px solid white;
+        border-radius: 5px;
+      }
     }
   }
 }
