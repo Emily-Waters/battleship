@@ -1,13 +1,6 @@
 import { useReducer } from "react";
-
+import { r } from "../util/constants";
 export default function useStateManager() {
-  //---------------------------------------------REDUCER VARIABLES------------------------------------------------------
-  const reducerVariables = {
-    UPDATE_USER: "UPDATE_USER",
-    UPDATE_BOARD: "UPDATE_BOARD",
-    SET_SOCKET: "SET_SOCKET",
-  };
-  const r = reducerVariables;
   //---------------------------------------------------SHIPS------------------------------------------------------------
   const ships = [
     { name: "BATTLESHIP", XY: [0, 0], isVertical: true, size: 5, sections: [] },
@@ -50,10 +43,17 @@ export default function useStateManager() {
           ...state,
           socket: action.value,
         };
+      case r.SET_ERROR:
+        return {
+          ...state,
+          error: action.value,
+        };
+      case r.SET_USER_POOL:
+        return { ...state, userPool: action.value };
       default:
         return { ...state };
     }
   }
   //--------------------------------------------------RETURN------------------------------------------------------------
-  return { state, dispatch, r };
+  return { state, dispatch };
 }

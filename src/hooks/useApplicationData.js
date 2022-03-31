@@ -1,7 +1,10 @@
+import axios from "axios";
 import { useEffect } from "react";
+import { r } from "../util/constants";
 import useStateManager from "./useStateManager";
+
 export default function useApplicationData() {
-  const { state, dispatch, r } = useStateManager();
+  const { state, dispatch } = useStateManager();
   //---------------------------------------------INITIALIZE GAMEBOARD---------------------------------------------------
   function updateBoard({ ships }) {
     const updatedShips = ships.map((ship) => {
@@ -104,15 +107,19 @@ export default function useApplicationData() {
     updateBoard({ ships: updatedShips });
   }
   //-----------------------------------------------------LOGIN----------------------------------------------------------
-  function validateUser(name, password) {
-    // axios.post("api/users/login", { name, password });
-    console.log(name);
-    dispatch({ type: r.UPDATE_USER, value: name });
+  async function validateUser(email, password) {
+    const { data } = await axios.post("api/users/login", { email, password });
+    dispatch(data);
+  }
+
+  function clearErrors() {
+    dispatch({ type: r.SET_ERROR, value: "" });
   }
   //-----------------------------------------------------RETURN---------------------------------------------------------
   return {
     state,
+    dispatch,
     shipFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
-    loginFunctions: { validateUser },
+    loginFunctions: { validateUser, clearErrors },
   };
 }
