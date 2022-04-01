@@ -117,6 +117,10 @@ export default function useApplicationData() {
     dispatch(data);
   }
 
+  function logoutUser() {
+    dispatch({ type: r.UPDATE_USER, value: null });
+  }
+
   function clearErrors() {
     dispatch({ type: r.SET_ERROR, value: "" });
   }
@@ -125,6 +129,6 @@ export default function useApplicationData() {
     state,
     dispatch,
     shipFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
-    loginFunctions: { validateUser, registerUser, clearErrors },
+    loginFunctions: { validateUser, registerUser, logoutUser, clearErrors },
   };
 }
