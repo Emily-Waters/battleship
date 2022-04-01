@@ -5,6 +5,7 @@ const reducerVariables = {
   UPDATE_BOARD: "UPDATE_BOARD",
   SET_SOCKET: "SET_SOCKET",
   SET_USER_POOL: "SET_USER_POOL",
+  SET_STATUS: "SET_STATUS",
 };
 
 const r = reducerVariables;
