@@ -79,7 +79,7 @@ export default function useApplicationData() {
     return isInBounds && !isCollision;
   }
 
-  function rotateShip(ship, { ships, board }) {
+  function rotateShip(ship, { ships }) {
     const [...updatedShips] = ships;
 
     updatedShips.find(({ name }) => name === ship.name).isVertical = !ship.isVertical;
@@ -99,7 +99,7 @@ export default function useApplicationData() {
     return isInBounds && !isCollision;
   }
 
-  function moveShip(cellXY, ship, { ships, board }) {
+  function moveShip(cellXY, ship, { ships }) {
     const [...updatedShips] = ships;
 
     updatedShips.find(({ name }) => name === ship.name).XY = cellXY;
@@ -112,6 +112,11 @@ export default function useApplicationData() {
     dispatch(data);
   }
 
+  async function registerUser(email, username, password) {
+    const { data } = await axios.post("api/users/register", { email, username, password });
+    dispatch(data);
+  }
+
   function clearErrors() {
     dispatch({ type: r.SET_ERROR, value: "" });
   }
@@ -120,6 +125,6 @@ export default function useApplicationData() {
     state,
     dispatch,
     shipFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
-    loginFunctions: { validateUser, clearErrors },
+    loginFunctions: { validateUser, registerUser, clearErrors },
   };
 }

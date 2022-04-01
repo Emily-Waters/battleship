@@ -1,10 +1,10 @@
 import { useState } from "react";
-import "./Login.scss";
-export default function LoginForm({ loginFunctions, error, setLoginView }) {
-  const { validateUser, clearErrors } = loginFunctions;
+
+export default function RegisterForm({ loginFunctions, error, setLoginView }) {
+  const { registerUser, clearErrors } = loginFunctions;
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   return (
     <>
       <h2 className="login-title">SHATTLEBIP</h2>
@@ -15,10 +15,24 @@ export default function LoginForm({ loginFunctions, error, setLoginView }) {
         className="login-form"
         onSubmit={async (e) => {
           e.preventDefault();
-          validateUser(email, password);
+          registerUser(email, username, password);
         }}
       >
-        <span className="login-form-line"></span>
+        <span className="login-form-line">
+          <label htmlFor="name" className="login-form-label">
+            Username&nbsp;:&nbsp;
+          </label>
+          <input
+            type="text"
+            className="login-form-input"
+            required
+            value={username}
+            onChange={(e) => {
+              if (error) clearErrors();
+              setUsername(e.target.value);
+            }}
+          />
+        </span>
         <span className="login-form-line">
           <label htmlFor="email" className="login-form-label">
             Email&nbsp;:&nbsp;
@@ -51,10 +65,10 @@ export default function LoginForm({ loginFunctions, error, setLoginView }) {
         </span>
         <span className="login-btn-container">
           <button type="button" className="login-form-btn" onClick={setLoginView}>
-            Register
+            Back
           </button>
           <button type="submit" className="login-form-btn">
-            Login
+            Create
           </button>
         </span>
       </form>

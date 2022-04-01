@@ -3,7 +3,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import useApplicationData from "../hooks/useApplicationData";
 import useSocketMan from "../hooks/useSocketMan";
 import "./Application.scss";
-import Login from "./Login/Login";
+import Login from "./Login/index";
 import Placement from "./Placement";
 export default function App() {
   const { state, dispatch, shipFunctions, loginFunctions } = useApplicationData();
