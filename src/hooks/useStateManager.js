@@ -21,6 +21,7 @@ export default function useStateManager() {
     ships: ships,
     board: [],
     socket: null,
+    status: null,
   };
   //--------------------------------------------------REDUCER-----------------------------------------------------------
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -50,6 +51,11 @@ export default function useStateManager() {
         };
       case r.SET_USER_POOL:
         return { ...state, userPool: action.value };
+      case r.SET_STATUS:
+        return {
+          ...state,
+          status: action.value,
+        };
       default:
         return { ...state };
     }

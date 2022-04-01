@@ -124,11 +124,29 @@ export default function useApplicationData() {
   function clearErrors() {
     dispatch({ type: r.SET_ERROR, value: "" });
   }
+  //------------------------------------------------------MENU----------------------------------------------------------
+  function setStatusStyle({ status }) {
+    switch (status) {
+      case "LOADING":
+        return "yellow";
+      case "SELECT":
+        return "cyan";
+      case "PLAYING":
+        return "red";
+      default:
+        return "green";
+    }
+  }
+
+  function setStatus({ status }) {
+    dispatch({ type: r.SET_STATUS, value: status });
+  }
   //-----------------------------------------------------RETURN---------------------------------------------------------
   return {
     state,
     dispatch,
     shipFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
     loginFunctions: { validateUser, registerUser, logoutUser, clearErrors },
+    menuFunctions: { setStatus, setStatusStyle },
   };
 }
