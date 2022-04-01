@@ -2,8 +2,8 @@ import { useState } from "react";
 import "./Login.scss";
 export default function LoginForm({ loginFunctions, error, setLoginView }) {
   const { validateUser, clearErrors } = loginFunctions;
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("emily@emily.com");
+  const [password, setPassword] = useState("password");
 
   return (
     <>
@@ -26,6 +26,7 @@ export default function LoginForm({ loginFunctions, error, setLoginView }) {
           <input
             type="email"
             className="login-form-input"
+            placeholder="example@example.com"
             required
             value={email}
             onChange={(e) => {
@@ -41,6 +42,7 @@ export default function LoginForm({ loginFunctions, error, setLoginView }) {
           <input
             type="password"
             className="login-form-input"
+            placeholder="password"
             required
             value={password}
             onChange={(e) => {
