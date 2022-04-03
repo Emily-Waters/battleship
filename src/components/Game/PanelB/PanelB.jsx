@@ -18,6 +18,7 @@ export default function PanelB({ state, dispatch, userFunctions, gameFunctions, 
   return (
     <div className="panel--B">
       {!state.status && <div className="rules-container"></div>}
+
       {state.status === "SELECT" && (
         <div className="select-container">
           <h2 className="select-header">Who would you like to play against?</h2>
@@ -31,6 +32,7 @@ export default function PanelB({ state, dispatch, userFunctions, gameFunctions, 
           </span>
         </div>
       )}
+
       {state.status === "LOADING" && (
         <div className="loading-container">
           <div className="radar-container">

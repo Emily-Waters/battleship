@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { r } = require("./constants");
 const bcrypt = require("bcryptjs");
 const db = require("./db/index");
 const express = require("express");
@@ -28,7 +29,6 @@ const io = socketIo(server, {
 const users = {};
 const waitingForMatch = {};
 const matches = {};
-let matchID = 0;
 
 //-------------------------------------------------CONNECT USER---------------------------------------------------------
 io.on("connection", (socket) => {
@@ -41,35 +41,79 @@ io.on("connection", (socket) => {
     waitingForMatch[socket.id] = users[socket.id];
     gameMatcher();
   });
-  //------------------------------------------------CANCEL MATCH--------------------------------------------------------
-  socket.on("cancelmatch", ({ id }) => {
-    const match = matches[id];
-    delete waitingForMatch[match.firstPlayer];
-    delete waitingForMatch[match.secondPlayer];
-    io.to(match.firstPlayer).emit("matchover");
-    delete matches[id];
+  //-----------------------------------------------CANCEL MATCH---------------------------------------------------------
+  socket.on("dispatch", (action) => {
+    dispatch(socket, action);
+  });
+
+  socket.on("forfeit", (match) => {
+    delete matches[match.id];
+    match.players.forEach((user) => {
+      io.to(user.socket).emit("forfeit", { type: r.SET_STATUS, value: null });
+    });
   });
   //----------------------------------------------DISCONNECT USER-------------------------------------------------------
   socket.on("disconnect", (reason) => {
-    console.log(users[socket.id], ` - disconnected - ${reason}\t\t\t\t`);
+    console.log(users[socket.id], ` - disconnected - ${reason}`);
     delete users[socket.id];
     delete waitingForMatch[socket.id];
     serverStatus(users);
   });
 });
+
+function dispatch(socket, { type, value }) {
+  console.log("\nSocket : ", socket.id);
+  console.log("Type   : ", type);
+  console.log("Value  : ", value);
+
+  switch (type) {
+    case "FIND_MATCH":
+      waitingForMatch[socket.id] = users[socket.id];
+      const { action } = gameMatcher();
+      console.log(action);
+      if (action) {
+        action.forEach(({ type, value, players }) => {
+          players.forEach(({ socket }) => {
+            io.to(socket).emit("dispatch", action);
+          });
+        });
+      } else {
+        io.to(socket.id).emit("dispatch", [{ type, value }]);
+      }
+      break;
+    case "CANCEL_MATCH":
+      delete waitingForMatch[socket.id];
+      io.to(socket.id).emit("dispatch", [{ type: "SET_STATUS", value: null }]);
+      break;
+
+    default:
+      break;
+  }
+}
 //-------------------------------------------------MATCH USERS----------------------------------------------------------
 function gameMatcher() {
   const waitingArray = Object.values(waitingForMatch);
+
   if (waitingArray.length >= 2) {
-    const match = waitingArray.splice(0, 2);
     const id = generateMatchID();
+    const match = waitingArray.splice(0, 2);
     matches[id] = { id, players: match };
-    match.forEach((user, i) => {
-      delete waitingForMatch[user.socket];
-      io.to(user.socket).emit("findmatch", {
-        match: matches[id],
-      });
-    });
+    return {
+      action: [
+        { type: "SET_MATCH", value: matches[id], players: matches[id].players },
+        { type: "SET_STATUS", value: "PLAYING", players: matches[id].players },
+      ],
+    };
+
+    // return { type: "SET_MATCH", value: matches[id] };
+    // match.forEach((user, i) => {
+    //   delete waitingForMatch[user.socket];
+    //   io.to(user.socket).emit("findmatch", {
+    //     match: matches[id],
+    //   });
+    // });
+  } else {
+    return { action: null };
   }
 }
 
@@ -80,8 +124,9 @@ function generateMatchID() {
     })
     .join("");
 }
+//-------------------------------------------------SERVER STATUS--------------------------------------------------------
 function serverStatus(users) {
-  console.clear();
+  // console.clear();
   console.log("Server     : ", chalk.green("connected"));
   console.log("Port       : ", chalk.yellow(PORT));
   console.log("# of Users : ", Object.keys(users).length);

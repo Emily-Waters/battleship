@@ -35,20 +35,21 @@ export default function useStateManager() {
     board: [],
     socket: null,
     status: null,
-    opponent: null,
-    playing: false,
+    match: null,
   };
   //--------------------------------------------------REDUCER-----------------------------------------------------------
   const [state, dispatch] = useReducer(reducer, initialState);
 
   function reducer(state, action) {
+    console.log("ACTION TYPE : ", action.type);
+    console.log("ACTION VALUE:", action.value);
     switch (action.type) {
-      case r.UPDATE_USER:
+      case r.SET_USER:
         return {
           ...state,
           user: action.value,
         };
-      case r.UPDATE_BOARD:
+      case r.SET_BOARD:
         return {
           ...state,
           ships: action.value.ships,
@@ -71,10 +72,10 @@ export default function useStateManager() {
           ...state,
           status: action.value,
         };
-      case r.SET_PLAYING:
+      case r.SET_MATCH:
         return {
           ...state,
-          playing: action.value,
+          match: action.value,
         };
       default:
         return { ...state };

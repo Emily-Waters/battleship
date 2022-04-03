@@ -7,14 +7,13 @@ import useStateManager from "./useStateManager";
 export default function useApplicationData() {
   const { state, dispatch, initializedShips } = useStateManager();
   const { socketFunctions } = useSocketMan(dispatch);
-  const { connectSocket, findPartner } = socketFunctions;
   //---------------------------------------------INITIALIZE GAMEBOARD---------------------------------------------------
   function updateBoard({ ships }) {
     const updatedShips = ships.map((ship) => {
       return mapShipSections(ship);
     });
     const board = setCellStatus({ ships: updatedShips });
-    dispatch({ type: r.UPDATE_BOARD, value: { ships: updatedShips, board } });
+    dispatch({ type: r.SET_BOARD, value: { ships: updatedShips, board } });
   }
 
   useEffect(() => {
@@ -125,15 +124,17 @@ export default function useApplicationData() {
   }
 
   async function registerUser(email, username, password) {
-    const { data } = await axios.post("api/users/register", { email, username, password });
-    dispatch(data);
+    const {
+      data: { type, value },
+    } = await axios.post("api/users/register", { email, username, password });
+    dispatch({ type, value });
   }
 
   function logoutUser({ socket }) {
     if (socket && socket.connected) {
       socket.disconnect();
     }
-    dispatch({ type: r.UPDATE_USER, value: null });
+    dispatch({ type: r.SET_USER, value: null });
     dispatch({ type: r.SET_SOCKET, value: null });
   }
 
@@ -158,9 +159,18 @@ export default function useApplicationData() {
     dispatch({ type: r.SET_STATUS, value: status });
   }
 
-  function playGame(state) {
-    findPartner(state);
-    // dispatch({ type: r.SET_PLAYING, value: isPlaying });
+  const { connectSocket, findPartner, cancelMatch, quitMatch } = socketFunctions;
+
+  function playGame({ socket }) {
+    findPartner({ socket });
+  }
+
+  function cancelFindMatch({ socket }) {
+    cancelMatch({ socket });
+  }
+
+  function forfeitMatch({ socket, match }) {
+    quitMatch({ socket, match });
   }
 
   //------------------------------------------------------GAME----------------------------------------------------------
@@ -170,6 +180,16 @@ export default function useApplicationData() {
     state,
     dispatch,
     gameFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
-    userFunctions: { validateUser, registerUser, clearErrors, setStatus, setStatusStyle, logoutUser, playGame },
+    userFunctions: {
+      validateUser,
+      registerUser,
+      clearErrors,
+      setStatus,
+      setStatusStyle,
+      logoutUser,
+      playGame,
+      cancelFindMatch,
+      forfeitMatch,
+    },
   };
 }

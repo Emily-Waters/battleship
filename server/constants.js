@@ -10,4 +10,4 @@ const reducerVariables = {
 
 const r = reducerVariables;
 
-export { r };
+module.exports = { r };

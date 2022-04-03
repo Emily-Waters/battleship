@@ -3,27 +3,36 @@ import { r } from "../util/constants";
 
 export default function useSocketMan(dispatch) {
   function connectSocket({ user }) {
-    console.log("CONNECT SOCKET - ", user);
     const socket = io("ws://localhost:5000", { query: user });
-
-    socket.on("user", (user) => {
-      console.log(user);
-    });
 
     socket.on("findmatch", (match) => {
       dispatch({ type: r.SET_MATCH, value: match });
       dispatch({ type: r.SET_STATUS, value: "PLAYING" });
     });
+
+    socket.on("cancelmatch", () => {
+      dispatch({ type: r.SET_STATUS, value: null });
+    });
+
+    socket.on("dispatch", (action) => {
+      action.forEach(({ type, value }) => dispatch({ type, value }));
+      // dispatch({ type, value });
+    });
     return socket;
   }
 
   function findPartner({ socket }) {
-    socket.emit("findmatch");
+    socket.emit("dispatch", { type: "FIND_MATCH", value: null });
   }
 
   function cancelMatch({ socket }) {
-    socket.emit("cancelmatch");
+    // socket.emit("cancelmatch");
+    socket.emit("dispatch", { type: "CANCEL_MATCH", value: null });
   }
 
-  return { socketFunctions: { connectSocket, findPartner, cancelMatch } };
+  function quitMatch({ socket, match }) {
+    socket.emit("forfeit", { match });
+  }
+
+  return { socketFunctions: { connectSocket, findPartner, cancelMatch, quitMatch } };
 }
