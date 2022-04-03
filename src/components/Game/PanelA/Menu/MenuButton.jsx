@@ -1,7 +1,7 @@
 import "./Menu.scss";
 
-export default function MenuButton({ state, statusStyle, menuFunctions }) {
-  const { setStatus } = menuFunctions;
+export default function MenuButton({ state, statusStyle, userFunctions }) {
+  const { setStatus } = userFunctions;
   return (
     <button
       className="user-options-btn"

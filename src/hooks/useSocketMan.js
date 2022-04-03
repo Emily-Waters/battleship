@@ -1,24 +1,29 @@
-import { useEffect } from "react";
 import io from "socket.io-client";
 import { r } from "../util/constants";
 
-export default function useSocketMan(state, dispatch) {
-  useEffect(() => {
-    if (state.user) {
-      const socket = io("ws://localhost:5000", { query: state.user });
+export default function useSocketMan(dispatch) {
+  function connectSocket({ user }) {
+    console.log("CONNECT SOCKET - ", user);
+    const socket = io("ws://localhost:5000", { query: user });
 
-      socket.on("connect", () => {
-        console.log("Socket Connected: ", socket.id);
-      });
+    socket.on("user", (user) => {
+      console.log(user);
+    });
 
-      socket.on("user", (userPool) => {
-        dispatch({ type: r.SET_USER_POOL, value: userPool });
-        console.log(userPool);
-      });
+    socket.on("findmatch", (match) => {
+      dispatch({ type: r.SET_MATCH, value: match });
+      dispatch({ type: r.SET_STATUS, value: "PLAYING" });
+    });
+    return socket;
+  }
 
-      return () => {
-        if (socket.connected) socket.close();
-      };
-    }
-  }, [state.user]);
+  function findPartner({ socket }) {
+    socket.emit("findmatch");
+  }
+
+  function cancelMatch({ socket }) {
+    socket.emit("cancelmatch");
+  }
+
+  return { socketFunctions: { connectSocket, findPartner, cancelMatch } };
 }

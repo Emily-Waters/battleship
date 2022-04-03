@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-export default function RegisterForm({ loginFunctions, error, setLoginView }) {
-  const { registerUser, clearErrors } = loginFunctions;
+export default function RegisterForm({ userFunctions, error, setLoginView }) {
+  const { registerUser, clearErrors } = userFunctions;
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

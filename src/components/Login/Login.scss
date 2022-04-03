@@ -1,19 +1,9 @@
 @import "../../styles/variables.scss";
 
 .login-container {
-  display: flex;
-  flex-direction: column;
-  // justify-content: space-evenly;
-  align-items: center;
-  height: $cell-size * 11;
-  width: $cell-size * 11;
-  background-color: darkgray;
-  border: 10px solid black;
-  border-radius: 20px;
+  @include panel;
+  border-radius: 10px;
   padding: 10px;
-  background-image: url("https://www.stockvault.net/data/2020/06/30/277255/preview16.jpg");
-  background-size: contain;
-
   .login-title {
     margin: 2vw 0 2vw 0;
     font-size: 7vw;
@@ -69,26 +59,7 @@
       width: 100%;
       bottom: 2vw;
       .login-form-btn {
-        font-size: 2vw;
-        font-weight: bold;
-        height: 4vw;
-        width: 12vw;
-        background-color: unset;
-        backdrop-filter: blur(10px);
-        color: aliceblue;
-        outline: none;
-        border: 5px solid white;
-        border-radius: 1vw;
-
-        transition-duration: 125ms;
-
-        cursor: pointer;
-
-        &:hover {
-          box-shadow: 0px 0px 10px rgb(255, 255, 255) inset;
-          text-shadow: 0px 0px 10px white;
-          transform: scale(1.1);
-        }
+        @include button-style;
       }
     }
   }

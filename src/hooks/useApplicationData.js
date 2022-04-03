@@ -1,10 +1,13 @@
 import axios from "axios";
 import { useEffect } from "react";
 import { r } from "../util/constants";
+import useSocketMan from "./useSocketMan";
 import useStateManager from "./useStateManager";
 
 export default function useApplicationData() {
-  const { state, dispatch } = useStateManager();
+  const { state, dispatch, initializedShips } = useStateManager();
+  const { socketFunctions } = useSocketMan(dispatch);
+  const { connectSocket, findPartner } = socketFunctions;
   //---------------------------------------------INITIALIZE GAMEBOARD---------------------------------------------------
   function updateBoard({ ships }) {
     const updatedShips = ships.map((ship) => {
@@ -15,9 +18,13 @@ export default function useApplicationData() {
   }
 
   useEffect(() => {
-    updateBoard(state);
-  }, []);
+    reset();
+  }, [state.status]);
   //-----------------------------------------------MANAGE GAMEBOARD-----------------------------------------------------
+
+  function reset() {
+    updateBoard({ ships: initializedShips });
+  }
   function generateBoard() {
     const boardSize = 10;
     const rowTemplate = Array.from(Array(boardSize));
@@ -108,8 +115,13 @@ export default function useApplicationData() {
   }
   //-----------------------------------------------------LOGIN----------------------------------------------------------
   async function validateUser(email, password) {
-    const { data } = await axios.post("api/users/login", { email, password });
-    dispatch(data);
+    const {
+      data: { type, value },
+    } = await axios.post("api/users/login", { email, password });
+    console.log(value);
+    dispatch({ type, value });
+    const socket = connectSocket({ user: value });
+    dispatch({ type: r.SET_SOCKET, value: socket });
   }
 
   async function registerUser(email, username, password) {
@@ -117,8 +129,12 @@ export default function useApplicationData() {
     dispatch(data);
   }
 
-  function logoutUser() {
+  function logoutUser({ socket }) {
+    if (socket && socket.connected) {
+      socket.disconnect();
+    }
     dispatch({ type: r.UPDATE_USER, value: null });
+    dispatch({ type: r.SET_SOCKET, value: null });
   }
 
   function clearErrors() {
@@ -141,12 +157,19 @@ export default function useApplicationData() {
   function setStatus({ status }) {
     dispatch({ type: r.SET_STATUS, value: status });
   }
+
+  function playGame(state) {
+    findPartner(state);
+    // dispatch({ type: r.SET_PLAYING, value: isPlaying });
+  }
+
+  //------------------------------------------------------GAME----------------------------------------------------------
+
   //-----------------------------------------------------RETURN---------------------------------------------------------
   return {
     state,
     dispatch,
-    shipFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
-    loginFunctions: { validateUser, registerUser, logoutUser, clearErrors },
-    menuFunctions: { setStatus, setStatusStyle },
+    gameFunctions: { canRotateShip, rotateShip, canMoveShip, moveShip },
+    userFunctions: { validateUser, registerUser, clearErrors, setStatus, setStatusStyle, logoutUser, playGame },
   };
 }

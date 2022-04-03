@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./Login.scss";
-export default function LoginForm({ loginFunctions, error, setLoginView }) {
-  const { validateUser, clearErrors } = loginFunctions;
+export default function LoginForm({ userFunctions, socketFunctions, error, setLoginView }) {
+  const { validateUser, clearErrors } = userFunctions;
   const [email, setEmail] = useState("emily@emily.com");
   const [password, setPassword] = useState("password");
 
@@ -13,7 +13,7 @@ export default function LoginForm({ loginFunctions, error, setLoginView }) {
       </span>
       <form
         className="login-form"
-        onSubmit={async (e) => {
+        onSubmit={(e) => {
           e.preventDefault();
           validateUser(email, password);
         }}

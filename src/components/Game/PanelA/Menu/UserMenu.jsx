@@ -1,8 +1,8 @@
 import "./Menu.scss";
 import MenuButton from "./MenuButton";
 
-export default function UserMenu({ state, logoutUser, menuFunctions, displayUserMenu }) {
-  const { setStatusStyle } = menuFunctions;
+export default function UserMenu({ state, logoutUser, userFunctions, displayUserMenu }) {
+  const { setStatusStyle } = userFunctions;
   const statusStyle = setStatusStyle(state);
   const userMenuStyle = displayUserMenu ? "user-menu" : "user-menu--in";
   return (
@@ -22,7 +22,7 @@ export default function UserMenu({ state, logoutUser, menuFunctions, displayUser
         <button className="user-options-btn" style={{ color: "red", borderColor: "red" }} onClick={logoutUser}>
           Logout
         </button>
-        <MenuButton state={state} menuFunctions={menuFunctions} statusStyle={statusStyle} />
+        <MenuButton state={state} userFunctions={userFunctions} statusStyle={statusStyle} />
       </span>
     </div>
   );

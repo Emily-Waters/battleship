@@ -10,18 +10,33 @@ export default function useStateManager() {
     { name: "SCOUT", XY: [4, 0], isVertical: true, size: 2, sections: [] },
   ];
 
-  ships.forEach((ship) => {
-    ship.sections = Array.from(Array(ship.size)).map((_, i) => {
-      return { id: i, isHit: false, XY: ship.isVertical ? [ship.XY[0], ship.XY[1] + i] : [ship.XY[0] + i, ship.XY[1]] };
-    });
+  // ships.forEach((ship) => {
+  //   ship.sections = Array.from(Array(ship.size)).map((ship, i) => {
+  //     return { id: i, isHit: false, XY: ship.isVertical ? [ship.XY[0], ship.XY[1] + i] : [ship.XY[0] + i, ship.XY[1]] };
+  //   });
+  // });
+
+  const initializedShips = ships.map((ship, i) => {
+    return {
+      ...ship,
+      sections: Array.from(Array(ship.size)).map((section, i) => {
+        return {
+          id: i,
+          isHit: false,
+          XY: ship.isVertical ? [ship.XY[0], ship.XY[1] + i] : [ship.XY[0] + i, ship.XY[1]],
+        };
+      }),
+    };
   });
   //---------------------------------------------------INIT-------------------------------------------------------------
   const initialState = {
     user: null,
-    ships: ships,
+    ships: initializedShips,
     board: [],
     socket: null,
     status: null,
+    opponent: null,
+    playing: false,
   };
   //--------------------------------------------------REDUCER-----------------------------------------------------------
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -49,17 +64,23 @@ export default function useStateManager() {
           ...state,
           error: action.value,
         };
-      case r.SET_USER_POOL:
-        return { ...state, userPool: action.value };
+      case r.SET_OPPONENT:
+        return { ...state, opponent: action.value };
       case r.SET_STATUS:
         return {
           ...state,
           status: action.value,
         };
+      case r.SET_PLAYING:
+        return {
+          ...state,
+          playing: action.value,
+        };
       default:
         return { ...state };
     }
   }
+
   //--------------------------------------------------RETURN------------------------------------------------------------
-  return { state, dispatch };
+  return { state, dispatch, initializedShips };
 }

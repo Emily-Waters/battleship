@@ -1,7 +1,7 @@
 import PlacementBoardCell from "./PlacementBoardCell";
 import "./PlacementPhase.scss";
 
-export default function PlacementBoard({ state, shipFunctions }) {
+export default function PlacementBoard({ state, gameFunctions }) {
   function renderBoard({ ships, board }) {
     return board.map((row, index) => {
       return (
@@ -16,7 +16,7 @@ export default function PlacementBoard({ state, shipFunctions }) {
                 cellXY={cell.XY}
                 state={state}
                 ship={ship}
-                shipFunctions={shipFunctions}
+                gameFunctions={gameFunctions}
               />
             );
           })}
@@ -24,5 +24,5 @@ export default function PlacementBoard({ state, shipFunctions }) {
       );
     });
   }
-  return <div className={"placement-board"}>{renderBoard(state)}</div>;
+  return <div className="placement-container">{renderBoard(state)}</div>;
 }

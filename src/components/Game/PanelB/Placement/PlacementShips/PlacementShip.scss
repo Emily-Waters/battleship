@@ -1,4 +1,4 @@
-@import "../../../styles/variables.scss";
+@import "../../../../../styles/variables.scss";
 
 .ship-container {
   border: 2px solid black;
@@ -15,11 +15,6 @@
   transform: rotate(-90deg);
   width: $cell-size - 0.5vw;
   color: rgb(100, 0, 0);
-  // &:hover {
-  //   z-index: 4;
-  //   box-shadow: 0px 0px 10px black;
-  //   transform: scale(1.02);
-  // }
 
   &--rotated {
     @extend.ship-container;

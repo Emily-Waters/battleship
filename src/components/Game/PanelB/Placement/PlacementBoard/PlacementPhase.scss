@@ -1,26 +1,12 @@
-@import "../../../styles/variables.scss";
+@import "../../../../../styles/variables.scss";
 
 .placement-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-}
-.placement-board {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: $cell-size * 11;
-  width: $cell-size * 11;
-  background-color: darkgray;
-  border: 10px solid black;
-  border-radius: 20px;
-  padding: 10px;
-  background-image: url("https://www.stockvault.net/data/2020/06/30/277255/preview16.jpg");
-  background-size: contain;
+  height: 100%;
+  width: 100%;
 
   .board-row {
     display: flex;

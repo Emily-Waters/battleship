@@ -5,8 +5,8 @@ import Overlay from "./Overlay";
 
 const shipTypes = ["BATTLESHIP", "CRUISER", "FRIGATE", "DESTROYER", "SCOUT"];
 
-function PlacementBoardCell({ cellXY, ship, state, shipFunctions }) {
-  const { canMoveShip, canRotateShip, moveShip, rotateShip } = shipFunctions;
+function PlacementBoardCell({ cellXY, ship, state, gameFunctions }) {
+  const { canMoveShip, canRotateShip, moveShip, rotateShip } = gameFunctions;
   const isHead = ship && ship.XY[0] === cellXY[0] && ship.XY[1] === cellXY[1];
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
