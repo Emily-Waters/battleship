@@ -2,10 +2,10 @@ import React from "react";
 import { useDrag } from "react-dnd";
 import "./PlacementShip.scss";
 
-//4 * (#OfSections) - 0.5
 function PlacementShip({ ship, canRotateShip, rotateShip, state }) {
   const shipClass = ship.isVertical ? "ship-container--rotated" : "ship-container";
   const shipStyle = { height: `calc(4vw * ${ship.size} - 0.5vw)` };
+
   function handleClick() {
     if (canRotateShip(ship, state)) {
       rotateShip(ship, state);
@@ -39,7 +39,7 @@ function PlacementShip({ ship, canRotateShip, rotateShip, state }) {
     [state.ships]
   );
 
-  return (
+  return state.user.status === "SETUP" ? (
     <div
       ref={drag}
       onClick={handleClick}
@@ -52,6 +52,8 @@ function PlacementShip({ ship, canRotateShip, rotateShip, state }) {
     >
       {mapHitMarkers(ship)}
     </div>
+  ) : (
+    <div></div>
   );
 }
 

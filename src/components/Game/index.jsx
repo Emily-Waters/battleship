@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Divider from "./Divider/Divider";
-import PanelA from "./PanelA/PanelA";
-import PanelB from "./PanelB/PanelB";
+import Divider from "./Divider";
+import PanelA from "./PanelA";
+import PanelB from "./PanelB";
 
 export default function Game({ state, userFunctions, gameFunctions }) {
   const [displayUserMenu, setDisplayUserMenu] = useState(true);

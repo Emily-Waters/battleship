@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { r } = require("./constants");
+const { r, s } = require("./constants");
 const bcrypt = require("bcryptjs");
 const db = require("./db/index");
 const express = require("express");
@@ -33,13 +33,12 @@ const matches = {};
 //-------------------------------------------------CONNECT USER---------------------------------------------------------
 io.on("connection", (socket) => {
   console.log(chalk.magenta("\nClient Connected"), chalk.yellowBright(socket.id));
-  users[socket.id] = { name: socket.handshake.query.name, socket: socket.id };
+  users[socket.id] = { name: socket.handshake.query.name, socket: socket.id, isReady: false };
   serverStatus(users);
-
+  //----------------------------------------------DISPATCH ACTIONS------------------------------------------------------
   socket.on("dispatch", (action) => {
     dispatch(socket, action);
   });
-
   //----------------------------------------------DISCONNECT USER-------------------------------------------------------
   socket.on("disconnect", (reason) => {
     console.log(users[socket.id], ` - disconnected - ${reason}`);
@@ -48,44 +47,67 @@ io.on("connection", (socket) => {
     serverStatus(users);
   });
 });
-
+//------------------------------------------------DEFINE DISPATCH-------------------------------------------------------
 function dispatch(socket, { type, value }) {
   console.log("\nSocket : ", socket.id);
   console.log("Type   : ", type);
   console.log("Value  : ", value);
 
   switch (type) {
-    case "FORFEIT_MATCH":
+    case s.READY:
+      const id = value.match.id;
+      matches[id].players.find((player) => player.socket === socket.id).board = value.board;
+      matches[id].players.find((player) => player.socket === socket.id).ships = value.ships;
+      matches[id].players.find((player) => player.socket === socket.id).isReady = true;
+
+      if (matches[id].players.every((player) => player.isReady)) {
+        matches[id].players.forEach((player) => {
+          io.to(player.socket).emit("dispatch", [
+            { type: r.SET_USER_STATUS, value: { status: "PLAYING", msg: "SHATTLEBIP!" } },
+            { type: r.SET_BOARD, value: { board: player.board, ships: player.ships } },
+          ]);
+        });
+      } else {
+        io.to(socket.id).emit("dispatch", [
+          { type: r.SET_USER_STATUS, value: { status: "READY", msg: "Waiting for opponent" } },
+        ]);
+      }
+
+      break;
+    case s.FORFEIT_MATCH:
       delete matches[value.id];
       value.players.forEach((player) => {
-        value.winner = player.socket !== socket.id;
+        value.details = player.socket !== socket.id ? "You Won! Opponent Forfeitted" : "You Lost! You Forfeitted";
         io.to(player.socket).emit("dispatch", [
-          { type: "SET_LAST_MATCH", value },
-          { type: "SET_STATUS", value: "DEBRIEF" },
+          { type: r.SET_LAST_MATCH, value },
+          { type: r.SET_USER_STATUS, value: { status: "DEBRIEF", msg: value.details } },
         ]);
       });
 
       break;
 
-    case "FIND_MATCH":
+    case s.FIND_MATCH:
       waitingForMatch[socket.id] = users[socket.id];
       const { action } = gameMatcher();
       if (action) {
         action.forEach(({ players }) => {
-          players.forEach(({ socket }) => {
-            delete waitingForMatch[socket];
-            io.to(socket).emit("dispatch", action);
+          players.forEach((player) => {
+            delete waitingForMatch[player.socket];
+            player.isReady = false;
+            io.to(player.socket).emit("dispatch", action);
           });
         });
       } else {
-        io.to(socket.id).emit("dispatch", [{ type: "SET_STATUS", value: "WAITING" }]);
+        io.to(socket.id).emit("dispatch", [
+          { type: r.SET_USER_STATUS, value: { status: "WAITING", msg: "Finding An Opponent" } },
+        ]);
       }
 
       break;
 
-    case "CANCEL_MATCH":
+    case s.CANCEL_MATCH:
       delete waitingForMatch[socket.id];
-      io.to(socket.id).emit("dispatch", [{ type: "SET_STATUS", value: null }]);
+      io.to(socket.id).emit("dispatch", [{ type: r.SET_USER_STATUS, value: { status: null, msg: "" } }]);
 
       break;
 
@@ -103,8 +125,8 @@ function gameMatcher() {
     matches[id] = { id, players: match };
     return {
       action: [
-        { type: "SET_MATCH", value: matches[id], players: matches[id].players },
-        { type: "SET_STATUS", value: "PLAYING", players: matches[id].players },
+        { type: r.SET_MATCH, value: matches[id], players: matches[id].players },
+        { type: r.SET_USER_STATUS, value: { status: "SETUP", msg: "Placing ships" }, players: matches[id].players },
       ],
     };
   } else {
@@ -132,7 +154,7 @@ function serverStatus(users) {
       .join("")
   );
 }
-
+//-------------------------------------------------SERVER START---------------------------------------------------------
 server.listen(PORT, (err) => {
   if (!err) {
     console.log(chalk.green(`\nServer running on port : ${chalk.yellow(PORT)}`));

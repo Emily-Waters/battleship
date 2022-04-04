@@ -1,6 +1,6 @@
 import useApplicationData from "../hooks/useApplicationData";
 import "./Application.scss";
-import Game from "./Game/Game";
+import Game from "./Game";
 import Login from "./Login/";
 
 export default function App() {

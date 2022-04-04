@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useEffect } from "react";
 import { r } from "../util/constants";
 import { socketConnect } from "./useSocketMan";
 import useStateManager from "./useStateManager";
@@ -16,14 +15,13 @@ export default function useApplicationData() {
     dispatch({ type: r.SET_BOARD, value: { ships: updatedShips, board } });
   }
 
-  useEffect(() => {
-    reset();
-  }, [state.status]);
   //-----------------------------------------------MANAGE GAMEBOARD-----------------------------------------------------
 
   function reset() {
     updateBoard({ ships: initializedShips });
+    generateTargetBoard();
   }
+
   function generateBoard() {
     const boardSize = 10;
     const rowTemplate = Array.from(Array(boardSize));
@@ -33,6 +31,19 @@ export default function useApplicationData() {
         return { id: y * 10 + x, XY: [x, y], isOccupied: false, occupiedBy: null };
       });
     });
+  }
+
+  function generateTargetBoard() {
+    const boardSize = 10;
+    const rowTemplate = Array.from(Array(boardSize));
+
+    const targetBoard = rowTemplate.map((_, y) => {
+      return rowTemplate.map((_, x) => {
+        return { id: y * 10 + x, XY: [x, y], isTarget: false, isHit: false };
+      });
+    });
+
+    dispatch({ type: r.SET_TARGET_BOARD, value: targetBoard });
   }
 
   function setCellStatus({ ships }) {
@@ -146,6 +157,10 @@ export default function useApplicationData() {
     switch (status) {
       case "WAITING":
         return "yellow";
+      case "SETUP":
+        return "orange";
+      case "READY":
+        return "orange";
       case "PLAYING":
         return "red";
       case "DEBRIEF":
@@ -155,8 +170,8 @@ export default function useApplicationData() {
     }
   }
 
-  function setStatus({ status }) {
-    dispatch({ type: r.SET_STATUS, value: status });
+  function setUserStatus({ status, msg }) {
+    dispatch({ type: r.SET_USER_STATUS, value: { status, msg } });
   }
   //------------------------------------------------------GAME----------------------------------------------------------
 
@@ -169,9 +184,10 @@ export default function useApplicationData() {
       validateUser,
       registerUser,
       clearErrors,
-      setStatus,
+      setUserStatus,
       setStatusStyle,
       logoutUser,
+      reset,
     },
   };
 }

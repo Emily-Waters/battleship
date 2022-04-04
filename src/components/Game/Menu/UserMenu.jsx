@@ -3,14 +3,14 @@ import MenuButton from "./MenuButton";
 
 export default function UserMenu({ state, logoutUser, userFunctions, displayUserMenu }) {
   const { setStatusStyle } = userFunctions;
-  const statusStyle = setStatusStyle(state);
+  const statusStyle = setStatusStyle(state.user);
   const userMenuStyle = displayUserMenu ? "user-menu" : "user-menu--in";
   return (
     <div className={userMenuStyle}>
       <span className="user-header">
         <div className="user-name">{state.user.name}</div>
         <div className="user-status" style={{ color: statusStyle }}>
-          {state.status || "MENU"}
+          {state.user.status || "MENU"}
         </div>
       </span>
 

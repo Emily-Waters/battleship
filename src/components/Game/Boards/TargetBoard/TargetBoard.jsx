@@ -1,0 +1,29 @@
+import React from "react";
+import "../Board.scss";
+import TargetBoardCell from "./TargetBoardCell";
+
+function TargetBoard({ state }) {
+  function renderTargetBoard({ targetBoard }) {
+    console.log(targetBoard);
+    return targetBoard.map((row, index) => {
+      return (
+        <div className="board-row" key={index}>
+          {row.map((cell) => {
+            return (
+              <TargetBoardCell
+                key={cell.id}
+                cellXY={cell.XY}
+                state={state}
+                isTarget={cell.isTarget}
+                isHit={cell.isHit}
+              />
+            );
+          })}
+        </div>
+      );
+    });
+  }
+  return <div className="board-container">{renderTargetBoard(state)}</div>;
+}
+
+export default React.memo(TargetBoard);

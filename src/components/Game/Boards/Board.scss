@@ -1,6 +1,6 @@
-@import "../../../../../styles/variables.scss";
+@import "../../../styles/variables.scss";
 
-.placement-container {
+.board-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -25,6 +25,14 @@
       justify-content: center;
       overflow: visible;
 
+      &--target {
+        @extend .board-cell;
+        &:hover {
+          background-color: green;
+          opacity: 0.5;
+        }
+      }
+
       .board-cell-hitmarker {
         height: $cell-size / 3;
         width: $cell-size / 3;
@@ -32,6 +40,15 @@
         background-color: grey;
         border-radius: $cell-size / 6;
         z-index: 3;
+
+        &--hit {
+          @extend.board-cell-hitmarker;
+          background-color: darkred;
+        }
+        &--miss {
+          @extend.board-cell-hitmarker;
+          background-color: white;
+        }
       }
     }
   }

@@ -10,12 +10,6 @@ export default function useStateManager() {
     { name: "SCOUT", XY: [4, 0], isVertical: true, size: 2, sections: [] },
   ];
 
-  // ships.forEach((ship) => {
-  //   ship.sections = Array.from(Array(ship.size)).map((ship, i) => {
-  //     return { id: i, isHit: false, XY: ship.isVertical ? [ship.XY[0], ship.XY[1] + i] : [ship.XY[0] + i, ship.XY[1]] };
-  //   });
-  // });
-
   const initializedShips = ships.map((ship, i) => {
     return {
       ...ship,
@@ -28,11 +22,13 @@ export default function useStateManager() {
       }),
     };
   });
+
   //---------------------------------------------------INIT-------------------------------------------------------------
   const initialState = {
     user: null,
     ships: initializedShips,
     board: [],
+    targetBoard: [],
     socket: null,
     status: null,
     match: null,
@@ -50,6 +46,12 @@ export default function useStateManager() {
           ...state,
           user: action.value,
         };
+      case r.SET_USER_STATUS:
+        const user = { ...state.user };
+        return {
+          ...state,
+          user: { ...user, status: action.value.status, msg: action.value.msg },
+        };
       case r.SET_LAST_MATCH:
         return {
           ...state,
@@ -61,6 +63,11 @@ export default function useStateManager() {
           ships: action.value.ships,
           board: action.value.board,
         };
+      case r.SET_TARGET_BOARD:
+        return {
+          ...state,
+          targetBoard: action.value,
+        };
       case r.SET_SOCKET:
         return {
           ...state,
@@ -71,13 +78,7 @@ export default function useStateManager() {
           ...state,
           error: action.value,
         };
-      case r.SET_OPPONENT:
-        return { ...state, opponent: action.value };
-      case r.SET_STATUS:
-        return {
-          ...state,
-          status: action.value,
-        };
+
       case r.SET_MATCH:
         return {
           ...state,
