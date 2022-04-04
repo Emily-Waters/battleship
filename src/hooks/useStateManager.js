@@ -36,6 +36,7 @@ export default function useStateManager() {
     socket: null,
     status: null,
     match: null,
+    lastMatch: null,
   };
   //--------------------------------------------------REDUCER-----------------------------------------------------------
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -48,6 +49,11 @@ export default function useStateManager() {
         return {
           ...state,
           user: action.value,
+        };
+      case r.SET_LAST_MATCH:
+        return {
+          ...state,
+          lastMatch: action.value,
         };
       case r.SET_BOARD:
         return {

@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useEffect } from "react";
 import { r } from "../util/constants";
-import useSocketMan from "./useSocketMan";
+import { socketConnect } from "./useSocketMan";
 import useStateManager from "./useStateManager";
 
 export default function useApplicationData() {
   const { state, dispatch, initializedShips } = useStateManager();
-  const { socketFunctions } = useSocketMan(dispatch);
+
   //---------------------------------------------INITIALIZE GAMEBOARD---------------------------------------------------
   function updateBoard({ ships }) {
     const updatedShips = ships.map((ship) => {
@@ -117,10 +117,9 @@ export default function useApplicationData() {
     const {
       data: { type, value },
     } = await axios.post("api/users/login", { email, password });
-    console.log(value);
+    // console.log(value);
     dispatch({ type, value });
-    const socket = connectSocket({ user: value });
-    dispatch({ type: r.SET_SOCKET, value: socket });
+    socketConnect(dispatch, value);
   }
 
   async function registerUser(email, username, password) {
@@ -128,6 +127,7 @@ export default function useApplicationData() {
       data: { type, value },
     } = await axios.post("api/users/register", { email, username, password });
     dispatch({ type, value });
+    socketConnect(dispatch, value);
   }
 
   function logoutUser({ socket }) {
@@ -144,12 +144,12 @@ export default function useApplicationData() {
   //------------------------------------------------------MENU----------------------------------------------------------
   function setStatusStyle({ status }) {
     switch (status) {
-      case "LOADING":
+      case "WAITING":
         return "yellow";
-      case "SELECT":
-        return "cyan";
       case "PLAYING":
         return "red";
+      case "DEBRIEF":
+        return "cyan";
       default:
         return "green";
     }
@@ -158,21 +158,6 @@ export default function useApplicationData() {
   function setStatus({ status }) {
     dispatch({ type: r.SET_STATUS, value: status });
   }
-
-  const { connectSocket, findPartner, cancelMatch, quitMatch } = socketFunctions;
-
-  function playGame({ socket }) {
-    findPartner({ socket });
-  }
-
-  function cancelFindMatch({ socket }) {
-    cancelMatch({ socket });
-  }
-
-  function forfeitMatch({ socket, match }) {
-    quitMatch({ socket, match });
-  }
-
   //------------------------------------------------------GAME----------------------------------------------------------
 
   //-----------------------------------------------------RETURN---------------------------------------------------------
@@ -187,9 +172,6 @@ export default function useApplicationData() {
       setStatus,
       setStatusStyle,
       logoutUser,
-      playGame,
-      cancelFindMatch,
-      forfeitMatch,
     },
   };
 }

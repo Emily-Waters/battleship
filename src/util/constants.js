@@ -6,6 +6,7 @@ const reducerVariables = {
   SET_SOCKET: "SET_SOCKET",
   SET_STATUS: "SET_STATUS",
   SET_MATCH: "SET_MATCH",
+  SET_LAST_MATCH: "SET_LAST_MATCH",
 };
 
 const r = reducerVariables;

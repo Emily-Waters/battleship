@@ -32,26 +32,14 @@ const matches = {};
 
 //-------------------------------------------------CONNECT USER---------------------------------------------------------
 io.on("connection", (socket) => {
-  console.log(chalk.magenta("\nClient Connected"), chalk.yellowBright(socket.id), "\t\t\t\t");
+  console.log(chalk.magenta("\nClient Connected"), chalk.yellowBright(socket.id));
   users[socket.id] = { name: socket.handshake.query.name, socket: socket.id };
   serverStatus(users);
 
-  //----------------------------------------------JOIN MATCH POOL-------------------------------------------------------
-  socket.on("findmatch", () => {
-    waitingForMatch[socket.id] = users[socket.id];
-    gameMatcher();
-  });
-  //-----------------------------------------------CANCEL MATCH---------------------------------------------------------
   socket.on("dispatch", (action) => {
     dispatch(socket, action);
   });
 
-  socket.on("forfeit", (match) => {
-    delete matches[match.id];
-    match.players.forEach((user) => {
-      io.to(user.socket).emit("forfeit", { type: r.SET_STATUS, value: null });
-    });
-  });
   //----------------------------------------------DISCONNECT USER-------------------------------------------------------
   socket.on("disconnect", (reason) => {
     console.log(users[socket.id], ` - disconnected - ${reason}`);
@@ -67,23 +55,38 @@ function dispatch(socket, { type, value }) {
   console.log("Value  : ", value);
 
   switch (type) {
+    case "FORFEIT_MATCH":
+      delete matches[value.id];
+      value.players.forEach((player) => {
+        value.winner = player.socket !== socket.id;
+        io.to(player.socket).emit("dispatch", [
+          { type: "SET_LAST_MATCH", value },
+          { type: "SET_STATUS", value: "DEBRIEF" },
+        ]);
+      });
+
+      break;
+
     case "FIND_MATCH":
       waitingForMatch[socket.id] = users[socket.id];
       const { action } = gameMatcher();
-      console.log(action);
       if (action) {
-        action.forEach(({ type, value, players }) => {
+        action.forEach(({ players }) => {
           players.forEach(({ socket }) => {
+            delete waitingForMatch[socket];
             io.to(socket).emit("dispatch", action);
           });
         });
       } else {
-        io.to(socket.id).emit("dispatch", [{ type, value }]);
+        io.to(socket.id).emit("dispatch", [{ type: "SET_STATUS", value: "WAITING" }]);
       }
+
       break;
+
     case "CANCEL_MATCH":
       delete waitingForMatch[socket.id];
       io.to(socket.id).emit("dispatch", [{ type: "SET_STATUS", value: null }]);
+
       break;
 
     default:
@@ -104,14 +107,6 @@ function gameMatcher() {
         { type: "SET_STATUS", value: "PLAYING", players: matches[id].players },
       ],
     };
-
-    // return { type: "SET_MATCH", value: matches[id] };
-    // match.forEach((user, i) => {
-    //   delete waitingForMatch[user.socket];
-    //   io.to(user.socket).emit("findmatch", {
-    //     match: matches[id],
-    //   });
-    // });
   } else {
     return { action: null };
   }
