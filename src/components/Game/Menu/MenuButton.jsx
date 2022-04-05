@@ -13,7 +13,7 @@ export default function MenuButton({ state, statusStyle, userFunctions }) {
         state.user.status === "SETUP" &&
           socketEmitter(state, {
             type: "READY",
-            value: { match: state.match, board: state.board, ships: state.ships },
+            value: { match: state.match, board: state.board, ships: state.ships, targetBoard: state.targetBoard },
           });
         state.user.status === "READY" && socketEmitter(state, { type: "FORFEIT_MATCH", value: state.match });
         state.user.status === "PLAYING" && socketEmitter(state, { type: "FORFEIT_MATCH", value: state.match });

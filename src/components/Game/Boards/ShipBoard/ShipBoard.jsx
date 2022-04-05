@@ -11,7 +11,16 @@ function ShipBoard({ state, gameFunctions }) {
             const ship = ships.find((ship) =>
               ship.sections.find((section) => section.XY[0] === cell.XY[0] && section.XY[1] === cell.XY[1])
             );
-            return <BoardCell key={cell.id} cellXY={cell.XY} state={state} ship={ship} gameFunctions={gameFunctions} />;
+            return (
+              <BoardCell
+                key={cell.id}
+                cellXY={cell.XY}
+                state={state}
+                ship={ship}
+                gameFunctions={gameFunctions}
+                isTarget={cell.isTarget}
+              />
+            );
           })}
         </div>
       );

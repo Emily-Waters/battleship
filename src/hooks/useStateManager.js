@@ -33,6 +33,7 @@ export default function useStateManager() {
     status: null,
     match: null,
     lastMatch: null,
+    turn: false,
   };
   //--------------------------------------------------REDUCER-----------------------------------------------------------
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -41,6 +42,8 @@ export default function useStateManager() {
     console.log("ACTION TYPE : ", action.type);
     console.log("ACTION VALUE:", action.value);
     switch (action.type) {
+      case r.SET_TURN:
+        return { ...state, turn: action.value };
       case r.SET_USER:
         return {
           ...state,
@@ -78,7 +81,6 @@ export default function useStateManager() {
           ...state,
           error: action.value,
         };
-
       case r.SET_MATCH:
         return {
           ...state,

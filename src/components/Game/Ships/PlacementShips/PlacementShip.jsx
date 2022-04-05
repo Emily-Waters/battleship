@@ -53,7 +53,15 @@ function PlacementShip({ ship, canRotateShip, rotateShip, state }) {
       {mapHitMarkers(ship)}
     </div>
   ) : (
-    <div></div>
+    <div
+      className={shipClass}
+      style={{
+        ...shipStyle,
+        cursor: "default",
+      }}
+    >
+      {mapHitMarkers(ship)}
+    </div>
   );
 }
 

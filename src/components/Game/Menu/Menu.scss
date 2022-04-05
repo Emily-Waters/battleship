@@ -9,7 +9,7 @@
 
 .user-menu {
   @include panel-container;
-  z-index: 3;
+  z-index: 5;
   &--in {
     @extend .user-menu;
     transform: translateX(-100%);

@@ -8,6 +8,11 @@ export function socketConnect(dispatch, user) {
     action.forEach(({ type, value }) => dispatch({ type, value }));
   });
 
+  socket.on("disconnect", (reason) => {
+    console.log(reason);
+    dispatch({ type: r.SET_USER_STATUS, value: { status: null, msg: reason } });
+  });
+
   dispatch({ type: r.SET_SOCKET, value: socket });
 }
 

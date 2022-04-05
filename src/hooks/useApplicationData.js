@@ -28,7 +28,7 @@ export default function useApplicationData() {
 
     return rowTemplate.map((_, y) => {
       return rowTemplate.map((_, x) => {
-        return { id: y * 10 + x, XY: [x, y], isOccupied: false, occupiedBy: null };
+        return { id: y * 10 + x, XY: [x, y], isOccupied: false, occupiedBy: null, isTarget: false, isHit: false };
       });
     });
   }

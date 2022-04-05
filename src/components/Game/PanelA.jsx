@@ -9,12 +9,13 @@ export default function PanelA({
   logoutUser,
   displayUserMenu,
   setDisplayUserMenu,
+  socketEmitter,
 }) {
   return (
     <div className="panel--A">
       <UserMenu state={state} logoutUser={logoutUser} userFunctions={userFunctions} displayUserMenu={displayUserMenu} />
 
-      {state.user.status === "PLAYING" && <TargetBoard state={state} />}
+      {state.user.status === "PLAYING" && <TargetBoard state={state} socketEmitter={socketEmitter} />}
     </div>
   );
 }

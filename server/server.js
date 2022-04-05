@@ -51,17 +51,48 @@ io.on("connection", (socket) => {
 function dispatch(socket, { type, value }) {
   console.log("\nSocket : ", socket.id);
   console.log("Type   : ", type);
-  console.log("Value  : ", value);
 
   switch (type) {
-    case s.READY:
-      const id = value.match.id;
-      matches[id].players.find((player) => player.socket === socket.id).board = value.board;
-      matches[id].players.find((player) => player.socket === socket.id).ships = value.ships;
-      matches[id].players.find((player) => player.socket === socket.id).isReady = true;
+    case s.TARGET_CELL:
+      const X = value.XY[0];
+      const Y = value.XY[1];
+      let thisPlayer = matches[value.match.id].players.find((player) => player.socket === socket.id);
+      let otherPlayer = matches[value.match.id].players.find((player) => player.socket !== socket.id);
 
-      if (matches[id].players.every((player) => player.isReady)) {
-        matches[id].players.forEach((player) => {
+      thisPlayer.targetBoard[Y][X].isTarget = true;
+      otherPlayer.board[Y][X].isTarget = true;
+
+      if (otherPlayer.board[Y][X].isOccupied) {
+        thisPlayer.targetBoard[Y][X].isHit = true;
+        otherPlayer.board[Y][X].isHit = true;
+        const shipName = otherPlayer.board[Y][X].occupiedBy;
+        otherPlayer.ships
+          .find((ship) => ship.name === shipName)
+          .sections.forEach((section) => {
+            if (section.XY[0] === X && section.XY[1] === Y) {
+              section.isHit = true;
+            }
+          });
+      }
+
+      matches[value.match.id].players = [thisPlayer, otherPlayer];
+
+      matches[value.match.id].players.forEach((player) => {
+        io.to(player.socket).emit("dispatch", [
+          { type: r.SET_TURN, value: !player.turn },
+          { type: r.SET_BOARD, value: { board: player.board, ships: player.ships } },
+          { type: r.SET_TARGET_BOARD, value: player.targetBoard },
+        ]);
+      });
+
+      break;
+    case s.READY:
+      matches[value.match.id].players.find((player) => player.socket === socket.id).board = value.board;
+      matches[value.match.id].players.find((player) => player.socket === socket.id).ships = value.ships;
+      matches[value.match.id].players.find((player) => player.socket === socket.id).targetBoard = value.targetBoard;
+      matches[value.match.id].players.find((player) => player.socket === socket.id).isReady = true;
+      if (matches[value.match.id].players.every((player) => player.isReady)) {
+        matches[value.match.id].players.forEach((player, i) => {
           io.to(player.socket).emit("dispatch", [
             { type: r.SET_USER_STATUS, value: { status: "PLAYING", msg: "SHATTLEBIP!" } },
             { type: r.SET_BOARD, value: { board: player.board, ships: player.ships } },
@@ -122,6 +153,7 @@ function gameMatcher() {
   if (waitingArray.length >= 2) {
     const id = generateMatchID();
     const match = waitingArray.splice(0, 2);
+    match.players.forEach((player, i) => (player.turn = i ? false : true));
     matches[id] = { id, players: match };
     return {
       action: [

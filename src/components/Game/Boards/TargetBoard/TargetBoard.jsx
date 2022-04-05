@@ -2,7 +2,7 @@ import React from "react";
 import "../Board.scss";
 import TargetBoardCell from "./TargetBoardCell";
 
-function TargetBoard({ state }) {
+function TargetBoard({ state, socketEmitter }) {
   function renderTargetBoard({ targetBoard }) {
     console.log(targetBoard);
     return targetBoard.map((row, index) => {
@@ -16,6 +16,7 @@ function TargetBoard({ state }) {
                 state={state}
                 isTarget={cell.isTarget}
                 isHit={cell.isHit}
+                socketEmitter={socketEmitter}
               />
             );
           })}

@@ -5,7 +5,7 @@ import Overlay from "./Overlay";
 
 const shipTypes = ["BATTLESHIP", "CRUISER", "FRIGATE", "DESTROYER", "SCOUT"];
 
-function BoardCell({ cellXY, ship, state, gameFunctions }) {
+function BoardCell({ cellXY, ship, state, gameFunctions, isTarget }) {
   const { canMoveShip, canRotateShip, moveShip, rotateShip } = gameFunctions;
   const isHead = ship && ship.XY[0] === cellXY[0] && ship.XY[1] === cellXY[1];
   const [{ isOver, canDrop }, drop] = useDrop(
@@ -22,7 +22,11 @@ function BoardCell({ cellXY, ship, state, gameFunctions }) {
   );
 
   return (
-    <div className={"board-cell"} ref={state.user.status === "SETUP" ? drop : null}>
+    <div
+      className={"board-cell"}
+      ref={state.user.status === "SETUP" ? drop : null}
+      style={{ backgroundColor: isTarget && !ship ? "rgba(255, 0, 0, 0.5)" : "initial" }}
+    >
       {isHead && <PlacementShip ship={ship} canRotateShip={canRotateShip} rotateShip={rotateShip} state={state} />}
       {isOver && <Overlay canDrop={canDrop} />}
     </div>
