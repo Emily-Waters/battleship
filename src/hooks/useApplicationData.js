@@ -128,9 +128,12 @@ export default function useApplicationData() {
     const {
       data: { type, value },
     } = await axios.post("api/users/login", { email, password });
-    // console.log(value);
     dispatch({ type, value });
-    socketConnect(dispatch, value);
+    if (value.name) {
+      reset();
+      dispatch({ type: r.SET_USER_STATUS, value: { status: null, msg: "" } });
+      socketConnect(dispatch, value);
+    }
   }
 
   async function registerUser(email, username, password) {
@@ -138,7 +141,10 @@ export default function useApplicationData() {
       data: { type, value },
     } = await axios.post("api/users/register", { email, username, password });
     dispatch({ type, value });
-    socketConnect(dispatch, value);
+    if (value.name) {
+      reset();
+      socketConnect(dispatch, value);
+    }
   }
 
   function logoutUser({ socket }) {
@@ -153,22 +159,6 @@ export default function useApplicationData() {
     dispatch({ type: r.SET_ERROR, value: "" });
   }
   //------------------------------------------------------MENU----------------------------------------------------------
-  function setStatusStyle({ status }) {
-    switch (status) {
-      case "WAITING":
-        return "yellow";
-      case "SETUP":
-        return "orange";
-      case "READY":
-        return "orange";
-      case "PLAYING":
-        return "red";
-      case "DEBRIEF":
-        return "cyan";
-      default:
-        return "green";
-    }
-  }
 
   function setUserStatus({ status, msg }) {
     dispatch({ type: r.SET_USER_STATUS, value: { status, msg } });
@@ -185,7 +175,6 @@ export default function useApplicationData() {
       registerUser,
       clearErrors,
       setUserStatus,
-      setStatusStyle,
       logoutUser,
       reset,
     },

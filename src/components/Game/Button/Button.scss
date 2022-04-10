@@ -1,0 +1,50 @@
+@import "../../../styles/variables.scss";
+
+.btn {
+  background-color: transparent;
+  width: 9vw;
+  height: 4vw;
+  font-size: 1.5vw;
+  outline: none;
+  border: 0.5vw solid;
+  backdrop-filter: blur(20px);
+  border-radius: 1vw;
+  transition-duration: 125ms;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 0px 20px inset;
+  }
+
+  &--accept {
+    @extend .btn;
+    color: $accept-color;
+    &:hover {
+      box-shadow: $accept-color;
+    }
+  }
+
+  &--warning {
+    @extend .btn;
+    color: $warning-color;
+    &:hover {
+      box-shadow: $warning-color;
+    }
+  }
+
+  &--cancel {
+    @extend .btn;
+    color: $cancel-color;
+    &:hover {
+      box-shadow: $cancel-color;
+    }
+  }
+  &--info {
+    @extend .btn;
+    color: $info-color;
+    &:hover {
+      box-shadow: $info-color;
+    }
+  }
+}

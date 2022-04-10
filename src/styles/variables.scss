@@ -1,23 +1,8 @@
 $cell-size: 4vw;
-
-@mixin panel {
-  position: relative;
-  overflow: hidden;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  height: $cell-size * 11;
-  width: $cell-size * 11;
-
-  border: 10px solid black;
-  box-shadow: 0px 0px 10px black inset;
-
-  background-image: url("https://www.stockvault.net/data/2020/06/30/277255/preview16.jpg");
-  background-size: contain;
-}
+$warning-color: rgb(255, 155, 0);
+$accept-color: rgb(0, 175, 0);
+$cancel-color: red;
+$info-color: rgb(0, 200, 200);
 
 @mixin panel-container {
   position: absolute;
@@ -29,22 +14,6 @@ $cell-size: 4vw;
   background-image: url("https://www.stockvault.net/data/2020/06/30/277255/preview16.jpg");
   background-size: contain;
   overflow: hidden;
-}
-
-@mixin button-style {
-  background-color: transparent;
-  width: 9vw;
-  height: 4vw;
-  font-size: 1.5vw;
-  outline: none;
-  border: 7px solid;
-  backdrop-filter: blur(20px);
-  border-radius: 1vw;
-  transition-duration: 125ms;
-  cursor: pointer;
-  &:hover {
-    transform: scale(1.1);
-  }
 }
 
 @mixin col-flex {

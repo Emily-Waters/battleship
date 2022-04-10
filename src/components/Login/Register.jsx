@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../Game/Button/Button";
 
 export default function RegisterForm({ userFunctions, error, setLoginView }) {
   const { registerUser, clearErrors } = userFunctions;
@@ -6,7 +7,7 @@ export default function RegisterForm({ userFunctions, error, setLoginView }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   return (
-    <>
+    <div className="login-container">
       <h2 className="login-title">SHATTLEBIP</h2>
       <span className="login-error" style={{ opacity: error ? 1 : 0 }}>
         {error}
@@ -64,14 +65,15 @@ export default function RegisterForm({ userFunctions, error, setLoginView }) {
           />
         </span>
         <span className="login-btn-container">
-          <button type="button" className="login-form-btn" onClick={setLoginView}>
-            Back
-          </button>
-          <button type="submit" className="login-form-btn">
-            Create
-          </button>
+          <Button text={"Back"} buttonType={"button"} buttonStyle={"cancel"} handleClick={setLoginView} />
+          <Button
+            text={"Create"}
+            buttonType={"submit"}
+            buttonStyle={"accept"}
+            handleClick={() => registerUser(username, email, password)}
+          />
         </span>
       </form>
-    </>
+    </div>
   );
 }

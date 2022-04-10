@@ -14,69 +14,37 @@
 }
 
 .panel {
-  @include panel;
-  &--A {
-    @extend .panel;
-    border-radius: 10px 0px 0px 10px;
-  }
+  width: 48%;
+  height: 96%;
+  background-image: url("https://www.stockvault.net/data/2020/06/30/277255/preview16.jpg");
+  background-size: cover;
+  border: 0.25vw solid black;
+  border-radius: 0.5vw;
+  box-shadow: 0px 0px 20px black inset;
+}
 
-  &--B {
-    @extend .panel;
-    border-radius: 0px 10px 10px 0px;
+.user-status-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 50%;
+  width: 100%;
+  background-color: black;
+  border-bottom: 0.5vw solid black;
 
-    .loading-container {
-      @include col-flex;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
-      background-color: black;
-
-      .loading-status {
-        @include col-flex;
-        background-color: black;
-        border-radius: 6vw;
-
-        color: green;
-        font-size: 3vw;
-      }
-
-      .radar-container {
-        border-radius: 6vw;
-        background-color: black;
-        @include col-flex;
-        justify-content: center;
-        margin-bottom: 1vw;
-        .radar {
-          animation: rotate 3s linear infinite;
-          color: green;
-          height: 30vw;
-          width: 30vw;
-          border-radius: 15vw;
-          border: 2vw solid rgb(75, 75, 75);
-        }
-      }
-    }
-
-    .select-container {
-      @include col-flex;
-      height: 100%;
-      width: 100%;
-
-      .select-header {
-        font-size: 2vw;
-        margin: 0;
-      }
-
-      .select-btn-container {
-        @include col-flex;
-        flex-direction: row;
-
-        width: 100%;
-
-        .select-btn {
-          @include button-style;
-        }
-      }
+  .radar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    .radar {
+      animation: rotate 3s linear infinite;
+      color: green;
+      width: 15vw;
+      height: 15vw;
+      border-radius: 7.5vw;
     }
   }
 }

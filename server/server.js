@@ -26,152 +26,199 @@ const io = socketIo(server, {
   },
 });
 
-const users = {};
-const waitingForMatch = {};
-const matches = {};
-
 //-------------------------------------------------CONNECT USER---------------------------------------------------------
+const users = {};
+
 io.on("connection", (socket) => {
-  console.log(chalk.magenta("\nClient Connected"), chalk.yellowBright(socket.id));
-  users[socket.id] = { name: socket.handshake.query.name, socket: socket.id, isReady: false };
-  serverStatus(users);
+  users[socket.id] = { name: socket.handshake.query.name, id: socket.id, match: null };
+  console.log(chalk.magenta("\nClient Connected"), users[socket.id]);
   //----------------------------------------------DISPATCH ACTIONS------------------------------------------------------
   socket.on("dispatch", (action) => {
+    console.log(users[socket.id]);
     dispatch(socket, action);
   });
   //----------------------------------------------DISCONNECT USER-------------------------------------------------------
   socket.on("disconnect", (reason) => {
     console.log(users[socket.id], ` - disconnected - ${reason}`);
     delete users[socket.id];
-    delete waitingForMatch[socket.id];
-    serverStatus(users);
   });
 });
 //------------------------------------------------DEFINE DISPATCH-------------------------------------------------------
 function dispatch(socket, { type, value }) {
-  console.log("\nSocket : ", socket.id);
   console.log("Type   : ", type);
 
   switch (type) {
     case s.TARGET_CELL:
-      const X = value.XY[0];
-      const Y = value.XY[1];
-      let thisPlayer = matches[value.match.id].players.find((player) => player.socket === socket.id);
-      let otherPlayer = matches[value.match.id].players.find((player) => player.socket !== socket.id);
-
-      thisPlayer.targetBoard[Y][X].isTarget = true;
-      otherPlayer.board[Y][X].isTarget = true;
-
-      if (otherPlayer.board[Y][X].isOccupied) {
-        thisPlayer.targetBoard[Y][X].isHit = true;
-        otherPlayer.board[Y][X].isHit = true;
-        const shipName = otherPlayer.board[Y][X].occupiedBy;
-        otherPlayer.ships
-          .find((ship) => ship.name === shipName)
-          .sections.forEach((section) => {
-            if (section.XY[0] === X && section.XY[1] === Y) {
-              section.isHit = true;
-            }
-          });
-      }
-
-      matches[value.match.id].players = [thisPlayer, otherPlayer];
-
-      matches[value.match.id].players.forEach((player) => {
-        io.to(player.socket).emit("dispatch", [
-          { type: r.SET_TURN, value: !player.turn },
-          { type: r.SET_BOARD, value: { board: player.board, ships: player.ships } },
-          { type: r.SET_TARGET_BOARD, value: player.targetBoard },
-        ]);
-      });
-
+      targetCell(socket, value.XY);
       break;
     case s.READY:
-      matches[value.match.id].players.find((player) => player.socket === socket.id).board = value.board;
-      matches[value.match.id].players.find((player) => player.socket === socket.id).ships = value.ships;
-      matches[value.match.id].players.find((player) => player.socket === socket.id).targetBoard = value.targetBoard;
-      matches[value.match.id].players.find((player) => player.socket === socket.id).isReady = true;
-      if (matches[value.match.id].players.every((player) => player.isReady)) {
-        matches[value.match.id].players.forEach((player, i) => {
-          io.to(player.socket).emit("dispatch", [
-            { type: r.SET_USER_STATUS, value: { status: "PLAYING", msg: "SHATTLEBIP!" } },
-            { type: r.SET_BOARD, value: { board: player.board, ships: player.ships } },
-          ]);
-        });
-      } else {
-        io.to(socket.id).emit("dispatch", [
-          { type: r.SET_USER_STATUS, value: { status: "READY", msg: "Waiting for opponent" } },
-        ]);
-      }
-
+      playerReady(socket, value);
       break;
     case s.FORFEIT_MATCH:
-      delete matches[value.id];
-      value.players.forEach((player) => {
-        value.details = player.socket !== socket.id ? "You Won! Opponent Forfeitted" : "You Lost! You Forfeitted";
-        io.to(player.socket).emit("dispatch", [
-          { type: r.SET_LAST_MATCH, value },
-          { type: r.SET_USER_STATUS, value: { status: "DEBRIEF", msg: value.details } },
-        ]);
-      });
-
+      forfeitMatch(socket);
       break;
-
     case s.FIND_MATCH:
-      waitingForMatch[socket.id] = users[socket.id];
-      const { action } = gameMatcher();
-      if (action) {
-        action.forEach(({ players }) => {
-          players.forEach((player) => {
-            delete waitingForMatch[player.socket];
-            player.isReady = false;
-            io.to(player.socket).emit("dispatch", action);
-          });
-        });
-      } else {
-        io.to(socket.id).emit("dispatch", [
-          { type: r.SET_USER_STATUS, value: { status: "WAITING", msg: "Finding An Opponent" } },
-        ]);
-      }
-
+      matchMaker(socket);
       break;
-
     case s.CANCEL_MATCH:
-      delete waitingForMatch[socket.id];
-      io.to(socket.id).emit("dispatch", [{ type: r.SET_USER_STATUS, value: { status: null, msg: "" } }]);
-
+      cancelMatch(socket);
       break;
-
     default:
       break;
   }
+  console.log("\nUser   : \n", users[socket.id]);
 }
 //-------------------------------------------------MATCH USERS----------------------------------------------------------
-function gameMatcher() {
-  const waitingArray = Object.values(waitingForMatch);
 
-  if (waitingArray.length >= 2) {
-    const id = generateMatchID();
-    const match = waitingArray.splice(0, 2);
-    match.players.forEach((player, i) => (player.turn = i ? false : true));
-    matches[id] = { id, players: match };
-    return {
-      action: [
-        { type: r.SET_MATCH, value: matches[id], players: matches[id].players },
-        { type: r.SET_USER_STATUS, value: { status: "SETUP", msg: "Placing ships" }, players: matches[id].players },
-      ],
-    };
+function getUserAndOpponent(id) {
+  return { user: users[id].id, opponent: users[id].match.opponent };
+}
+
+function matchMaker(socket) {
+  users[socket.id].match = { status: "WAITING" };
+  const userPool = Object.values(users);
+
+  const opponent = userPool.find((player) => {
+    if (player.match && player.match.status === "WAITING" && player.id !== socket.id) {
+      return player;
+    }
+  });
+
+  if (opponent) {
+    const match = [socket.id, opponent.id];
+    match.forEach((id) => {
+      users[id].match.status = "MATCHED";
+      users[id].match.opponent = id === socket.id ? opponent.id : socket.id;
+      io.to(id).emit("dispatch", [
+        { type: r.SET_MATCH, value: users[id].match },
+        { type: r.SET_USER_STATUS, value: { status: "SETUP", msg: "Placing ships" } },
+      ]);
+    });
   } else {
-    return { action: null };
+    io.to(socket.id).emit("dispatch", [
+      { type: r.SET_USER_STATUS, value: { status: "WAITING", msg: "Finding Opponent" } },
+    ]);
   }
 }
 
-function generateMatchID() {
-  return Array.from(Array(6))
-    .map(() => {
-      return String.fromCharCode(Math.floor(Math.random() * 78) + 48);
-    })
-    .join("");
+function cancelMatch(socket) {
+  users[socket.id].match = null;
+  io.to(socket.id).emit("dispatch", [
+    { type: r.SET_USER_STATUS, value: { status: "DEBRIEF", msg: "Cancelled matchmaking" } },
+  ]);
+}
+
+function forfeitMatch(socket) {
+  const { user, opponent } = getUserAndOpponent(socket.id);
+  const match = [user, opponent];
+
+  match.forEach((player) => {
+    users[player].match = null;
+    io.to(player).emit("dispatch", [
+      {
+        type: r.SET_USER_STATUS,
+        value: {
+          status: "DEBRIEF",
+          msg: player === user ? "You Lost! You forfeited the match" : "You Won! Your opponent forfeited the match!",
+        },
+      },
+      { type: r.SET_MATCH, value: null },
+    ]);
+  });
+}
+
+function playerReady(socket, { ships, board, targetBoard }) {
+  users[socket.id].match = { ...users[socket.id].match, ships, board, targetBoard, status: "READY" };
+
+  const { user, opponent } = getUserAndOpponent(socket.id);
+  const match = [user, opponent];
+
+  if (users[opponent].match.status === "READY") {
+    match.forEach((player, index) => {
+      const { ships, board, targetBoard } = users[player].match;
+      users[player].match.status = "PLAYING";
+      io.to(player).emit("dispatch", [
+        { type: r.SET_BOARD, value: { ships, board } },
+        { type: r.SET_TARGET_BOARD, value: targetBoard },
+        {
+          type: r.SET_USER_STATUS,
+          value: {
+            status: index ? "WAITING" : "PLAYING",
+            msg: index ? `Waiting for ${users[users[player].match.opponent].name}'s turn` : "SHATTLEBIP!",
+          },
+        },
+      ]);
+    });
+  } else {
+    io.to(user).emit("dispatch", [
+      { type: r.SET_USER_STATUS, value: { status: "WAITING", msg: `Waiting for ${users[opponent].name} to be ready` } },
+    ]);
+  }
+}
+
+function targetCell(socket, XY) {
+  const [X, Y] = XY;
+
+  const { user, opponent } = getUserAndOpponent(socket.id);
+  const match = [user, opponent];
+  let isHit = false;
+
+  users[user].match.targetBoard[Y][X].isTarget = true;
+  users[opponent].match.board[Y][X].isTarget = true;
+
+  if (users[opponent].match.board[Y][X].isOccupied) {
+    users[opponent].match.board[Y][X].isHit = true;
+    users[user].match.targetBoard[Y][X].isHit = true;
+    const shipName = users[opponent].match.board[Y][X].occupiedBy;
+    users[opponent].match.ships.forEach((ship) => {
+      if (ship.name === shipName) {
+        ship.sections.forEach((section) => {
+          if (section.XY[0] === X && section.XY[1] === Y) {
+            section.isHit = true;
+            isHit = true;
+          }
+        });
+      }
+    });
+  }
+
+  const playerHasWon = checkForWinner(opponent);
+
+  match.forEach((player) => {
+    const { ships, board, targetBoard } = users[player].match;
+    if (playerHasWon) {
+      io.to(player).emit("dispatch", [
+        { type: r.SET_TARGET_BOARD, value: targetBoard },
+        { type: r.SET_BOARD, value: { board, ships } },
+        { type: r.SET_USER_STATUS, value: { status: "DEBRIEF", msg: user === player ? "You Won!" : "You Lost!" } },
+        { type: r.SET_MATCH, value: null },
+      ]);
+    } else {
+      io.to(player).emit("dispatch", [
+        { type: r.SET_TARGET_BOARD, value: targetBoard },
+        { type: r.SET_BOARD, value: { board, ships } },
+        {
+          type: r.SET_USER_STATUS,
+          value: {
+            status: user === player ? "WAITING" : "PLAYING",
+            msg: `${isHit ? "Hit" : "Miss"}! Waiting for ${users[users[player].match.opponent].name}'s turn`,
+          },
+        },
+      ]);
+    }
+  });
+}
+
+function checkForWinner(opponent) {
+  let hasPlayerWon = true;
+  users[opponent].match.ships.forEach((ship) => {
+    ship.sections.forEach((section) => {
+      if (!section.isHit) {
+        hasPlayerWon = false;
+      }
+    });
+  });
+  return hasPlayerWon;
 }
 //-------------------------------------------------SERVER STATUS--------------------------------------------------------
 function serverStatus(users) {

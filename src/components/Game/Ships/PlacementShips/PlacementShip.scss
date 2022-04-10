@@ -1,19 +1,25 @@
 @import "../../../../styles/variables.scss";
 
 .ship-container {
-  border: 2px solid black;
+  border: 0.2vw solid black;
   border-radius: 5px;
   background-color: lightgray;
   position: absolute;
-  top: calc(0.25vw - 1px);
-  left: calc(0.25vw - 1px);
+  top: 2.5%;
+  left: 2.5%;
   z-index: 2;
   cursor: pointer;
   transition-property: transform;
   transition-duration: 250ms;
-  transform-origin: 1.75vw 1.75vw;
+  transform-origin: 1.6vw 1.6vw;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+
   transform: rotate(-90deg);
-  width: $cell-size - 0.5vw;
+  width: 95%;
   color: rgb(100, 0, 0);
 
   &--rotated {
@@ -22,10 +28,9 @@
   }
 
   .ship-hitmarker {
-    position: absolute;
-    height: $cell-size / 3;
-    width: $cell-size / 3;
+    height: 1.25vw;
+    width: 1.25vw;
     border: 2px solid black;
-    border-radius: $cell-size/6;
+    border-radius: 50%;
   }
 }

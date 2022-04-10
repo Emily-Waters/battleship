@@ -24,7 +24,12 @@ function TargetBoard({ state, socketEmitter }) {
       );
     });
   }
-  return <div className="board-container">{renderTargetBoard(state)}</div>;
+  return (
+    <div className="board-container">
+      {state.user.status === "SETUP" && <div className="board-overlay"></div>}
+      {renderTargetBoard(state)}
+    </div>
+  );
 }
 
 export default React.memo(TargetBoard);

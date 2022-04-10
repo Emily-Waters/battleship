@@ -8,12 +8,7 @@ export default function Login({ userFunctions, socketFunctions, error }) {
   return (
     <div className="login-container">
       {loginView ? (
-        <LoginForm
-          userFunctions={userFunctions}
-          socketFunctions={socketFunctions}
-          error={error}
-          setLoginView={() => setLoginView(!loginView)}
-        />
+        <LoginForm userFunctions={userFunctions} error={error} setLoginView={() => setLoginView(!loginView)} />
       ) : (
         <RegisterForm userFunctions={userFunctions} error={error} setLoginView={() => setLoginView(!loginView)} />
       )}

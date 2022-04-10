@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../Game/Button/Button";
 import "./Login.scss";
 export default function LoginForm({ userFunctions, socketFunctions, error, setLoginView }) {
   const { validateUser, clearErrors } = userFunctions;
@@ -6,7 +7,7 @@ export default function LoginForm({ userFunctions, socketFunctions, error, setLo
   const [password, setPassword] = useState("password");
 
   return (
-    <>
+    <div className="login-container">
       <h2 className="login-title">SHATTLEBIP</h2>
       <span className="login-error" style={{ opacity: error ? 1 : 0 }}>
         {error}
@@ -18,7 +19,6 @@ export default function LoginForm({ userFunctions, socketFunctions, error, setLo
           validateUser(email, password);
         }}
       >
-        <span className="login-form-line"></span>
         <span className="login-form-line">
           <label htmlFor="email" className="login-form-label">
             Email&nbsp;:&nbsp;
@@ -51,15 +51,14 @@ export default function LoginForm({ userFunctions, socketFunctions, error, setLo
             }}
           />
         </span>
+
+        <span className="login-form-line"></span>
+
         <span className="login-btn-container">
-          <button type="button" className="login-form-btn" onClick={setLoginView}>
-            Register
-          </button>
-          <button type="submit" className="login-form-btn">
-            Login
-          </button>
+          <Button text={"Register"} buttonType={"button"} buttonStyle={"warning"} handleClick={setLoginView} />
+          <Button text={"Login"} buttonType={"submit"} buttonStyle={"accept"} handleClick={() => clearErrors()} />
         </span>
       </form>
-    </>
+    </div>
   );
 }

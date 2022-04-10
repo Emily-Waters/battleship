@@ -1,37 +1,78 @@
 @import "../styles/variables.scss";
 
-.App {
-  width: 100vw;
-  height: 100vh;
+.main-container {
+  height: 40vw;
+  width: 95vw;
+  border: 1vw solid #000000;
+  border-radius: 2vw;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-image: url("https://images.unsplash.com/photo-1614923756087-ca9f44b6ec55?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80");
-  background-repeat: no-repeat;
-  background-size: cover;
 
-  .game-divider {
-    height: $cell-size * 11;
-    width: 6vw;
-    @include col-flex;
-    backdrop-filter: blur(20px);
-    border-top: 10px solid black;
-    border-bottom: 10px solid black;
+  .game-container {
+    height: 100%;
+    width: 80vw;
 
-    .nav-icon {
-      height: 4vw;
-      width: 4vw;
-      color: lightgray;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
 
-      transition-duration: 125ms;
+    position: relative;
 
-      &--enabled {
-        @extend .nav-icon;
-        color: white;
-        &:hover {
-          transform: scale(1.1);
-        }
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .waiting-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2vw;
+    color: white;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+  }
+
+  .sidebar {
+    height: 100%;
+    width: 20vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-left: 1vw solid black;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .user-btns {
+      width: 100%;
+      height: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+
+    .user-status {
+      font-size: 2vw;
+
+      &--accept {
+        @extend .user-status;
+        color: $accept-color;
+      }
+
+      &--warning {
+        @extend .user-status;
+        color: $warning-color;
+      }
+
+      &--cancel {
+        @extend .user-status;
+        color: $cancel-color;
       }
     }
   }

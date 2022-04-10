@@ -4,7 +4,7 @@ import "./PlacementShip.scss";
 
 function PlacementShip({ ship, canRotateShip, rotateShip, state }) {
   const shipClass = ship.isVertical ? "ship-container--rotated" : "ship-container";
-  const shipStyle = { height: `calc(4vw * ${ship.size} - 0.5vw)` };
+  const shipStyle = { height: `calc(100% * ${ship.size} - 1.25%)` };
 
   function handleClick() {
     if (canRotateShip(ship, state)) {
